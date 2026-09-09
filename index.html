@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Zane Barber Studio - Barbería de autor en Guacara, Carabobo. Cortes clásicos y ejecutivos, perfilado de barba a navaja y grooming premium sin prisas.">
+  <title>Zane Barber Studio | Barbería de Autor en Guacara, Carabobo</title>
+
+  <!-- Favicon / Brand icons -->
+  <link rel="icon" type="image/png" href="images/logo.png">
+
+  <!-- Tipografías locales: Barlow Condensed & DM Sans -->
+  <link href="css/fonts/fonts.css" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS (local) -->
+  <link href="css/vendor/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Font Awesome 6.5.1 (local) -->
+  <link rel="stylesheet" href="css/fa/all.min.css">
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="navbar navbar-expand-lg navbar-zane sticky-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand" href="#inicio">
+        <img src="images/logo.png" alt="Logo de Zane Barber Studio" class="brand-logo">
+        <span class="brand-text">ZANE<span class="text-gold">BARBER</span></span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navZane" aria-controls="navZane" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navZane">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link active" href="#inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#galeria">Galería</a></li>
+          <li class="nav-item"><a class="nav-link" href="#horarios">Horarios</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+        </ul>
+        <div class="nav-actions d-flex align-items-center gap-2">
+          <a href="#reserva" data-booking-open class="btn btn-zane btn-sm rounded-pill px-4">
+            <i class="fab fa-whatsapp me-1"></i> Reservar
+          </a>
+          <a href="/?admin=1" class="admin-nav-link" id="adminAccessTop" hidden aria-label="Abrir panel administrativo">
+            <i class="fas fa-lock me-1" aria-hidden="true"></i> Admin
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ==================== MODAL DE RESERVA ==================== -->
+  <div class="modal fade booking-modal" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <span class="eyebrow">Tu próxima visita</span>
+            <h2 class="modal-title" id="bookingModalLabel">Agenda tu cita</h2>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <form id="bookingForm" novalidate>
+          <div class="modal-body">
+            <div class="booking-fields">
+              <label for="bookingService">Servicio deseado</label>
+              <select id="bookingService" name="service" required>
+                <option value="">Elige un servicio</option>
+                <option value="Corte Clásico y/o Tijeras" data-price="6">Corte Clásico y/o Tijeras — $6 USD</option>
+                <option value="Corte Con Barba" data-price="8">Corte Con Barba — $8 USD</option>
+                <option value="Corte VIP" data-price="10">Corte VIP — $10 USD</option>
+                <option value="Corte VIP Con Barba" data-price="12">Corte VIP Con Barba — $12 USD</option>
+                <option value="Colorimetría" data-price="45">Colorimetría — Desde $45 USD</option>
+              </select>
+              <label for="bookingDate">Fecha preferida</label>
+              <input id="bookingDate" name="date" type="date" required>
+              <label for="bookingTime">Hora tentativa</label>
+              <select id="bookingTime" name="time" required>
+                <option value="">Elige una hora</option>
+                <option>9:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+                <option>12:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
+                <option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option>
+              </select>
+            </div>
+            <div class="booking-summary" aria-live="polite">
+              <span>Detalle de tu cita</span>
+              <strong id="bookingSummary">Completa los datos para continuar</strong>
+            </div>
+            <p class="booking-error" id="bookingError" role="alert"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-zane w-100">
+              <i class="fab fa-whatsapp me-2"></i>Confirmar por WhatsApp
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== HERO ==================== -->
+  <header class="hero-zane" id="inicio">
+    <div class="hero-ambient-glow" aria-hidden="true"></div>
+    <div class="container position-relative">
+      <div class="row align-items-center min-vh-80 py-5">
+        <div class="col-lg-7">
+          <div class="hero-badge">
+            <i class="fas fa-crown me-2"></i>
+            <span>Barbería de Oficio & Grooming Lounge</span>
+          </div>
+          <h1 class="hero-title">
+            TU CORTE.<br>
+            <span class="text-gold-gradient">TU FIRMA.</span>
+          </h1>
+          <p class="hero-lead">
+            Cortes precisos, barba al milímetro y atención sin prisas en un ambiente exclusivo. 
+            El estándar que merece tu imagen personal en El Sisal, Guacara.
+          </p>
+          <div class="power-banner" role="note">
+            <div class="power-banner-icon">
+              <i class="fas fa-bolt" aria-hidden="true"></i>
+            </div>
+            <div class="power-banner-content">
+              <strong>Servicio Garantizado · 100% Activos</strong>
+              <small>Contamos con respaldo eléctrico continuo para que tu cita nunca se detenga.</small>
+            </div>
+          </div>
+          <div class="hero-cta-group">
+            <a href="#reserva" data-booking-open class="btn btn-zane btn-lg rounded-pill px-4">
+              <i class="fab fa-whatsapp me-2"></i>Agendar cita
+            </a>
+            <a href="#servicios" class="btn btn-outline-zane btn-lg rounded-pill px-4">
+              Ver servicios <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+          </div>
+        </div>
+        <div class="col-lg-5 d-none d-lg-block text-center">
+          <div class="hero-media">
+            <div class="hero-media-backdrop" aria-hidden="true"></div>
+            <div class="hero-media-frame">
+              <div class="hero-media-tag">
+                <span class="pulse-dot"></span>
+                <span>Trabajo Real / 01</span>
+              </div>
+              <img src="images/Imagen pegada.png" alt="Corte realizado en Zane Barber Studio" class="hero-image shadow-lg">
+              <div class="hero-media-info">
+                <strong>Zane Barber Studio</strong>
+                <small><i class="fas fa-map-marker-alt text-gold me-1"></i> El Sisal, Guacara</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== SERVICIOS ==================== -->
+  <section id="servicios" class="services-section" data-section>
+    <div class="container">
+      <div class="services-head text-center">
+        <span class="eyebrow">Carta de Servicios</span>
+        <h2 class="section-title">Oficio, Precisión & Detalle</h2>
+        <p class="section-subtitle">Nada de prisas ni cortes genéricos. En Zane cada servicio se ejecuta con técnica depurada, toalla caliente y productos premium.</p>
+      </div>
+
+      <div class="services-list">
+        <article class="service-row service-row--featured">
+          <span class="service-number">01</span>
+          <div class="service-copy">
+            <h3>Corte Clásico y/o Tijeras <span class="service-tag">El Favorito</span></h3>
+            <p>Experiencia completa de corte clásico o a tijera, adaptada a la estructura craneal del cliente. Finalizado con peinado y detalles de acabado con navaja. Incluye rayas.</p>
+          </div>
+          <span class="service-price">$6 <small>USD</small></span>
+          <a href="#reserva" data-booking-open data-booking-service="Corte Clásico y/o Tijeras" class="service-cta" aria-label="Reservar Corte Clásico y/o Tijeras">
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </article>
+
+        <article class="service-row">
+          <span class="service-number">02</span>
+          <div class="service-copy">
+            <h3>Corte Con Barba</h3>
+            <p>Servicio integral de barbería tradicional que combina corte (clásico o a tijera) y diseño de barba con detalles de alta precisión a navaja y peinado profesional.</p>
+          </div>
+          <span class="service-price">$8 <small>USD</small></span>
+          <a href="#reserva" data-booking-open data-booking-service="Corte Con Barba" class="service-cta" aria-label="Reservar Corte Con Barba">
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </article>
+
+        <article class="service-row">
+          <span class="service-number">03</span>
+          <div class="service-copy">
+            <h3>Corte VIP</h3>
+            <p>Servicio exclusivo de barbería diseñado para revitalizar tu imagen y ofrecerte un momento de descanso absoluto. Incluye corte personalizado (clásico, a tijera o diseño), lavado profundo con hidratación capilar de alta gama, masaje relajante y mascarilla facial purificante.</p>
+          </div>
+          <span class="service-price">$10 <small>USD</small></span>
+          <a href="#reserva" data-booking-open data-booking-service="Corte VIP" class="service-cta" aria-label="Reservar Corte VIP">
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </article>
+
+        <article class="service-row">
+          <span class="service-number">04</span>
+          <div class="service-copy">
+            <h3>Corte VIP Con Barba</h3>
+            <p>Nuestra experiencia más exclusiva de barbería y cuidado personal. Combina corte personalizado (clásico o a tijera), diseño y perfilado de barba, lavado con hidratación capilar profunda, masaje relajante y mascarilla facial purificante.</p>
+          </div>
+          <span class="service-price">$12 <small>USD</small></span>
+          <a href="#reserva" data-booking-open data-booking-service="Corte VIP Con Barba" class="service-cta" aria-label="Reservar Corte VIP Con Barba">
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </article>
+        <article class="service-row">
+          <span class="service-number">05</span>
+          <div class="service-copy">
+            <h3>Colorimetría</h3>
+            <ul class="service-sublist">
+              <li><strong>Colorimetría Básica:</strong> cobertura de canas / camuflaje natural — matizado sutil (15–20 min) — o tinte global de un tono parejo.</li>
+              <li><strong>Decoloración y Diseño:</strong> platinado / blondo (decoloración completa + matiz) o reflejos, mechas y balayage masculino.</li>
+              <li><strong>Fantasía y Tendencia:</strong> colores fantasía — decoloración + tonos vívidos (azul, rosa, morado, etc.).</li>
+            </ul>
+          </div>
+          <span class="service-price">Desde $45 <small>USD</small></span>
+          <a href="#reserva" data-booking-open data-booking-service="Colorimetría" class="service-cta" aria-label="Reservar Colorimetría">
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </article>
+      </div>
+
+      <p class="price-note text-center mt-4">
+        <i class="fas fa-shield-alt text-gold me-1"></i> Precios claros en dólares americanos (USD). Aceptamos efectivo y pago móvil al cambio del día.
+      </p>
+
+      <div class="services-note text-center mt-4">
+        <span>¿Dudas sobre qué corte te favorece? Asesoramiento sin costo por WhatsApp:</span>
+        <a href="https://wa.me/584121453691" class="wa-direct-link" target="_blank" rel="noopener">
+          <i class="fab fa-whatsapp ms-1"></i> +58 412-1453691
+        </a>
+      </div>
+
+      <p class="price-note text-center mt-2">
+        <i class="fas fa-flask text-gold me-1"></i> Todos los servicios de decoloración o cambios drásticos requieren una valoración previa o prueba de mechón para cuidar la salud de tu fibra capilar.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== GALERÍA ==================== -->
+  <section id="galeria" class="section section--gallery">
+    <div class="container">
+      <div class="section-head text-center">
+        <span class="eyebrow">Galería de Resultados</span>
+        <h2 class="section-title">Trabajos Reales en la Silla</h2>
+        <p class="section-subtitle">Sin filtros de IA ni imágenes prefabricadas. Resultados auténticos de nuestros clientes.</p>
+      </div>
+
+      <div class="gallery-filters" role="group" aria-label="Filtrar galería">
+        <button type="button" class="gallery-filter is-active" data-filter="all">Todos</button>
+        <button type="button" class="gallery-filter" data-filter="cortes">Cortes</button>
+        <button type="button" class="gallery-filter" data-filter="barba">Barba</button>
+        <button type="button" class="gallery-filter" data-filter="combos">Espacio & Combos</button>
+      </div>
+
+      <div class="gallery-grid">
+        <figure class="gallery-item" data-category="combos" tabindex="0">
+          <img src="images/Imagen de persona recortandose y tomando cafe.jpeg" alt="Cliente en la silla de Zane Barber Studio disfrutando de café de cortesía" loading="lazy">
+          <figcaption>Corte & Café de Cortesía</figcaption>
+        </figure>
+
+        <figure class="gallery-item" data-category="cortes" tabindex="0">
+          <img src="images/Imagen de un corte.jpeg" alt="Fade degradado al detalle en Zane Barber Studio" loading="lazy">
+          <figcaption>Degradado Fade al Detalle</figcaption>
+        </figure>
+
+        <figure class="gallery-item" data-category="barba" tabindex="0">
+          <img src="images/Imagen del barbero haciendo una barba (2).png" alt="Perfilado y ritual de barba en Zane Barber Studio" loading="lazy">
+          <figcaption>Ritual de Barba & Navaja</figcaption>
+        </figure>
+
+        <figure class="gallery-item" data-category="combos" tabindex="0">
+          <img src="images/Imagen del Lobby de la barberia.jpeg" alt="Lobby y sala de espera de Zane Barber Studio" loading="lazy">
+          <figcaption>Zona Lounge & Espera</figcaption>
+        </figure>
+
+        <figure class="gallery-item" data-category="cortes" tabindex="0">
+          <img src="images/Imagen de un cabello pintado de blanco.png" alt="Diseño de color y platinado en Zane Barber Studio" loading="lazy">
+          <figcaption>Colorimetría & Platinado</figcaption>
+        </figure>
+
+        <figure class="gallery-item" data-category="combos" tabindex="0">
+          <img src="images/Imagen de la recepcion enfocando un pcoo mas el logo de la barberia.jpeg" alt="Recepción con el logo insignia de Zane Barber Studio" loading="lazy">
+          <figcaption>Recepción Zane Studio</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TESTIMONIOS ==================== -->
+  <section class="section testimonials-section" aria-labelledby="testimonials-title">
+    <div class="container">
+      <div class="testimonials-layout">
+        <div class="section-head mb-0">
+          <span class="eyebrow">Opiniones Reales</span>
+          <h2 class="section-title" id="testimonials-title">Una Silla a la que Vuelves</h2>
+          <p class="section-subtitle mb-0">La lealtad de nuestros clientes se gana corte a corte con puntualidad y respeto por su tiempo.</p>
+        </div>
+
+        <div id="testimonialsCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5500">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <blockquote class="testimonial">
+                <div class="testimonial-header">
+                  <div class="testimonial-avatar-monogram"><span>CM</span></div>
+                  <div class="testimonial-meta">
+                    <span class="client-name">Carlos Mendoza</span>
+                    <span class="client-badge">Cliente Frecuente</span>
+                  </div>
+                </div>
+                <div class="testimonial-stars" aria-label="5 de 5 estrellas">
+                  <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p>«Por fin encontré un corte que me queda igual de bien al salir de la barbería que una semana después. Se nota el oficio y la dedicación en cada detalle.»</p>
+              </blockquote>
+            </div>
+
+            <div class="carousel-item">
+              <blockquote class="testimonial">
+                <div class="testimonial-header">
+                  <div class="testimonial-avatar-monogram"><span>AR</span></div>
+                  <div class="testimonial-meta">
+                    <span class="client-name">Andrés Rodríguez</span>
+                    <span class="client-badge">Cliente Ejecutivo</span>
+                  </div>
+                </div>
+                <div class="testimonial-stars" aria-label="5 de 5 estrellas">
+                  <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p>«Excelente ambiente, café de primera, siempre puntuales y un trato impecable. Saber que tienen planta eléctrica me da total tranquilidad para no perder mi cita.»</p>
+              </blockquote>
+            </div>
+
+            <div class="carousel-item">
+              <blockquote class="testimonial">
+                <div class="testimonial-header">
+                  <div class="testimonial-avatar-monogram"><span>LF</span></div>
+                  <div class="testimonial-meta">
+                    <span class="client-name">Luis F. Alvarado</span>
+                    <span class="client-badge">Barba & Fade</span>
+                  </div>
+                </div>
+                <div class="testimonial-stars" aria-label="5 de 5 estrellas">
+                  <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                </div>
+                <p>«El ritual de toalla caliente y navaja en la barba es otro nivel. Hacía tiempo que no encontraba una barbería seria en Guacara donde realmente entiendan la fisionomía.»</p>
+              </blockquote>
+            </div>
+          </div>
+
+          <div class="testimonials-controls">
+            <button class="carousel-control-prev" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="prev" aria-label="Testimonio anterior">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#testimonialsCarousel" data-bs-slide="next" aria-label="Siguiente testimonio">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="0" class="active" aria-label="Testimonio 1"></button>
+            <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="1" aria-label="Testimonio 2"></button>
+            <button type="button" data-bs-target="#testimonialsCarousel" data-bs-slide-to="2" aria-label="Testimonio 3"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== ESTADÍSTICAS ==================== -->
+  <section class="stats-section" aria-label="Zane Barber Studio en números">
+    <div class="container stats-grid">
+      <div class="stat">
+        <strong data-counter="5">0</strong>
+        <span>Años de Oficio</span>
+      </div>
+      <div class="stat">
+        <strong data-counter="1200" data-suffix="+">0</strong>
+        <span>Cortes Realizados</span>
+      </div>
+      <div class="stat">
+        <strong data-counter="98" data-suffix="%">0</strong>
+        <span>Clientes que Vuelven</span>
+      </div>
+      <div class="stat">
+        <strong data-counter="5" data-suffix=".0">0</strong>
+        <span>Valoración Media ★</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PREGUNTAS FRECUENTES ==================== -->
+  <section class="section faq-section" id="preguntas">
+    <div class="container faq-layout">
+      <div class="section-head">
+        <span class="eyebrow">Resuelve tus Dudas</span>
+        <h2 class="section-title">Preguntas Frecuentes</h2>
+        <p class="section-subtitle">Todo lo que necesitas saber antes de tu visita a nuestro estudio.</p>
+      </div>
+      <div class="accordion" id="faqAccordion">
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne" aria-expanded="true" aria-controls="faqOne">
+              ¿Es obligatorio agendar cita previa?
+            </button>
+          </h3>
+          <div id="faqOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Recomendamos agendar para garantizar que tu barbero te atienda puntualmente sin tiempos muertos de espera. No obstante, si estás cerca, puedes consultarnos disponibilidad por WhatsApp para atenderte de inmediato.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
+              ¿Qué formas de pago aceptan?
+            </button>
+          </h3>
+          <div id="faqTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Aceptamos efectivo en dólares americanos (USD) y Bolívares vía Pago Móvil o transferencia bancaria según la tasa del día.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqThree" aria-expanded="false" aria-controls="faqThree">
+              ¿Cómo llegar y dónde están ubicados?
+            </button>
+          </h3>
+          <div id="faqThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Nos encontramos en la Calle Guayana, Sector El Sisal, Guacara, Estado Carabobo. Contamos con acceso fácil y referencia directa en Google Maps.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFour" aria-expanded="false" aria-controls="faqFour">
+              ¿Los precios publicados están en dólares?
+            </button>
+          </h3>
+          <div id="faqFour" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              Sí, nuestros precios se encuentran expresados en USD para mantener tarifas transparentes y estables. Puedes liquidar en divisas o moneda local.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h3 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFive" aria-expanded="false" aria-controls="faqFive">
+              ¿Qué ocurre si hay cortes de energía eléctrica?
+            </button>
+          </h3>
+          <div id="faqFive" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+            <div class="accordion-body">
+              No nos apagamos. El estudio cuenta con sistema de respaldo eléctrico completo (luces, máquinas, climatización) para que tu servicio no sufra ninguna alteración.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== HORARIOS ==================== -->
+  <section id="horarios" class="section hours-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+          <div class="section-head text-center">
+            <span class="eyebrow">Planifica tu Semana</span>
+            <h2 class="section-title">Horarios de Atención</h2>
+            <p class="section-subtitle">Horarios continuos diseñados para adaptarse a tu rutina laboral y personal.</p>
+          </div>
+
+          <div class="hours-card mt-4">
+            <div class="hours-row">
+              <span class="hours-day"><i class="fas fa-calendar-day text-gold me-2"></i> Lunes a Viernes</span>
+              <span class="hours-value">9:00 AM – 7:00 PM</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day"><i class="fas fa-calendar-day text-gold me-2"></i> Sábados</span>
+              <span class="hours-value">9:00 AM – 8:00 PM</span>
+            </div>
+            <div class="hours-row hours-row--closed">
+              <span class="hours-day"><i class="fas fa-moon me-2"></i> Domingos</span>
+              <span class="hours-value badge-closed">Cerrado</span>
+            </div>
+          </div>
+
+          <div class="power-note mx-auto mt-4">
+            <i class="fas fa-bolt text-gold" aria-hidden="true"></i>
+            <span><strong>Respaldo Propio</strong><small>Si falla el fluido eléctrico, continuamos operando al 100%.</small></span>
+          </div>
+
+          <a href="#reserva" data-booking-open class="btn btn-zane btn-lg rounded-pill mt-4 px-5">
+            <i class="fab fa-whatsapp me-2"></i>Agendar Turno por WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== LIGHTBOX DE GALERÍA ==================== -->
+  <div class="lightbox" id="galleryLightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle" aria-hidden="true">
+    <button class="lightbox-close" type="button" aria-label="Cerrar galería">&times;</button>
+    <button class="lightbox-prev" type="button" aria-label="Imagen anterior"><i class="fas fa-arrow-left"></i></button>
+    <figure class="lightbox-content">
+      <img src="" alt="" id="lightboxImage">
+      <figcaption id="lightboxTitle"></figcaption>
+      <span id="lightboxCounter"></span>
+    </figure>
+    <button class="lightbox-next" type="button" aria-label="Siguiente imagen"><i class="fas fa-arrow-right"></i></button>
+  </div>
+
+  <!-- ==================== CONTACTO / UBICACIÓN ==================== -->
+  <section id="contacto" class="section section--contact">
+    <div class="container">
+      <div class="section-head text-center">
+        <span class="eyebrow">Ubicación & Contacto</span>
+        <h2 class="section-title">Encuéntranos en Guacara</h2>
+        <p class="section-subtitle">Fácil acceso en El Sisal, estacionamiento cercano y un ambiente pensado para tu confort.</p>
+      </div>
+
+      <div class="contact-shell">
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3 class="contact-title">Canales Directos</h3>
+            <ul class="contact-list">
+              <li>
+                <span class="contact-icon"><i class="fas fa-map-marker-alt"></i></span>
+                <div>
+                  <strong>Dirección del Estudio</strong>
+                  <span>Calle Guayana, Sector El Sisal, Guacara, Edo. Carabobo, Venezuela</span>
+                </div>
+              </li>
+              <li>
+                <span class="contact-icon"><i class="fab fa-whatsapp"></i></span>
+                <div>
+                  <strong>WhatsApp & Citas</strong>
+                  <a href="https://wa.me/584121453691" target="_blank" rel="noopener">+58 412-1453691</a>
+                </div>
+              </li>
+              <li>
+                <span class="contact-icon"><i class="fas fa-envelope"></i></span>
+                <div>
+                  <strong>Correo Electrónico</strong>
+                  <a href="mailto:zanebarberstudio83@gmail.com">zanebarberstudio83@gmail.com</a>
+                </div>
+              </li>
+              <li>
+                <span class="contact-icon"><i class="fab fa-instagram"></i></span>
+                <div>
+                  <strong>Instagram Oficial</strong>
+                  <a href="https://www.instagram.com/zane_barberstudio" target="_blank" rel="noopener">@zane_barberstudio</a>
+                </div>
+              </li>
+            </ul>
+
+            <div class="contact-actions">
+              <a href="https://www.instagram.com/zane_barberstudio" class="btn btn-outline-zane rounded-circle" target="_blank" rel="noopener" aria-label="Instagram de Zane Barber">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://wa.me/584121453691" class="btn btn-outline-zane rounded-circle" target="_blank" rel="noopener" aria-label="WhatsApp de Zane Barber">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="contact-map">
+            <div class="ratio ratio-16x9 map-container">
+              <iframe src="https://www.google.com/maps?q=Zane+Barber+Studio,+Guacara,+Carabobo,+Venezuela&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Mapa de ubicación de Zane Barber Studio"></iframe>
+              <div class="map-scroll-shield" aria-hidden="true"></div>
+            </div>
+            <a href="https://www.google.com/maps?q=Zane+Barber+Studio,+2015,+Guacara+2015,+Carabobo&ftid=0x8e804500589a93e3:0xd1371fef41c5b01f&entry=gps&g_st=ic" class="btn btn-zane mt-3 w-100" target="_blank" rel="noopener">
+              <i class="fas fa-directions me-2"></i>Cómo llegar con Google Maps
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== PANEL ADMINISTRATIVO ==================== -->
+  <section class="admin-section" id="adminPanel" hidden>
+    <div class="container">
+      <div class="admin-login" id="adminLogin">
+        <span class="eyebrow">Acceso Privado</span>
+        <h2 class="section-title">Gestión Zane Barber Studio</h2>
+        <p>Ingresa la contraseña de seguridad para acceder al panel de control.</p>
+        <form id="adminLoginForm" class="admin-login-form">
+          <label for="adminPassword">Contraseña</label>
+          <input id="adminPassword" type="password" autocomplete="current-password" placeholder="••••••••" required>
+          <button type="submit" class="btn btn-zane">Ingresar</button>
+          <p class="admin-error" id="adminLoginError" role="alert"></p>
+        </form>
+      </div>
+
+      <div class="admin-dashboard" id="adminDashboard" hidden>
+        <div class="admin-heading">
+          <div>
+            <span class="eyebrow">Panel de Control Interno</span>
+            <h2 class="section-title">Administración del Estudio</h2>
+          </div>
+          <button type="button" class="btn btn-outline-zane" id="adminLogout">
+            <i class="fas fa-sign-out-alt me-1"></i> Cerrar sesión
+          </button>
+        </div>
+
+        <div class="admin-toolbar">
+          <div id="dashboardInfo" class="admin-dash-stats"></div>
+          <button type="button" class="btn btn-zane" id="sendAllReminders">
+            <i class="fab fa-whatsapp me-2"></i>Enviar recordatorios pendientes
+          </button>
+        </div>
+
+        <nav class="admin-tabs" role="tablist">
+          <button type="button" class="admin-tab is-active" data-panel-tab="clients" role="tab">
+            <span><i class="fas fa-users me-1"></i> Clientes</span>
+            <span class="tab-count" id="tabCountClients">0</span>
+          </button>
+          <button type="button" class="admin-tab" data-panel-tab="styles" role="tab">
+            <span><i class="fas fa-scissors me-1"></i> Estilos</span>
+            <span class="tab-count" id="tabCountStyles">0</span>
+          </button>
+          <button type="button" class="admin-tab" data-panel-tab="cash" role="tab">
+            <span><i class="fas fa-cash-register me-1"></i> Caja</span>
+          </button>
+          <button type="button" class="admin-tab" data-panel-tab="birthdays" role="tab">
+            <span><i class="fas fa-birthday-cake me-1"></i> Cumpleaños</span>
+            <span class="tab-count" id="tabCountBirthdays">0</span>
+          </button>
+        </nav>
+
+        <!-- CLIENTES -->
+        <div data-panel-view="clients">
+          <form class="client-form" id="clientForm">
+            <input type="hidden" id="clientId">
+            <h3 id="clientFormTitle">Agregar Nuevo Cliente</h3>
+            <div class="client-fields">
+              <div><label for="clientName">Nombre completo</label><input id="clientName" required></div>
+              <div><label for="clientPhone">Teléfono (WhatsApp)</label><input id="clientPhone" type="tel" placeholder="04121453691 o 584121453691" required></div>
+              <div><label for="clientBirthDate">Fecha de nacimiento</label><input id="clientBirthDate" type="date"></div>
+              <div><label for="clientLastCut">Fecha del último corte</label><input id="clientLastCut" type="date" required></div>
+              <div>
+                <label for="clientService">Servicio realizado</label>
+                <select id="clientService" required>
+                  <option value="">Selecciona un servicio</option>
+                  <option value="Corte Clásico y/o Tijeras">Corte Clásico y/o Tijeras — $6 USD</option>
+                  <option value="Corte Con Barba">Corte Con Barba — $8 USD</option>
+                  <option value="Corte VIP">Corte VIP — $10 USD</option>
+                  <option value="Corte VIP Con Barba">Corte VIP Con Barba — $12 USD</option>
+                  <option value="Colorimetría">Colorimetría — Desde $45 USD</option>
+                  <option value="Otro">Otro servicio</option>
+                </select>
+              </div>
+              <div>
+                <label for="clientSidesMachine">Medida en laterales</label>
+                <select id="clientSidesMachine">
+                  <option value="">Sin registrar</option>
+                  <option>Máquina 0</option>
+                  <option>Máquina 0.5</option>
+                  <option>Máquina 1</option>
+                  <option>Máquina 2</option>
+                  <option>Máquina 3</option>
+                  <option>Solo tijera</option>
+                </select>
+              </div>
+              <div>
+                <label for="clientTopFinish">Acabado superior</label>
+                <select id="clientTopFinish">
+                  <option value="">Sin registrar</option>
+                  <option>Tijera arriba</option>
+                  <option>Máquina arriba</option>
+                  <option>Texturizado</option>
+                  <option>Al ras</option>
+                </select>
+              </div>
+            </div>
+            <div class="client-form-actions">
+              <button type="submit" class="btn btn-zane" id="clientSubmit">Guardar Cliente</button>
+              <button type="button" class="btn btn-link text-gold" id="clientCancel" hidden>Cancelar edición</button>
+            </div>
+            <p class="admin-feedback" id="clientFeedback" role="status"></p>
+          </form>
+
+          <div class="message-template mt-4">
+            <label for="reminderTemplate">Plantilla de Recordatorio por WhatsApp</label>
+            <textarea id="reminderTemplate" rows="3">Hola {nombre}, ¿cómo estás? Ya han pasado {dias} días desde tu último {servicio} ({fecha_corte}). Cuando quieras, escríbenos para agendar tu próxima cita en Zane Barber Studio: https://wa.me/584121453691</textarea>
+            <small class="text-muted">Variables disponibles: {nombre}, {dias}, {servicio}, {fecha_corte}</small>
+          </div>
+
+          <div class="client-tools mt-4">
+            <input id="clientSearch" type="search" placeholder="Buscar por nombre o teléfono..." aria-label="Buscar clientes">
+            <select id="clientFilter" aria-label="Filtrar clientes">
+              <option value="all">Todos los clientes</option>
+              <option value="pending">Pendientes de corte (+21 días)</option>
+              <option value="current">Al día</option>
+            </select>
+            <button type="button" class="btn btn-outline-zane" id="exportBackup"><i class="fas fa-download me-1"></i> Exportar</button>
+            <button type="button" class="btn btn-outline-zane" id="importBackup"><i class="fas fa-upload me-1"></i> Importar</button>
+            <input id="backupFile" type="file" accept="application/json" hidden>
+          </div>
+
+          <div class="admin-list-head mt-4">
+            <h3>Clientes Registrados</h3>
+            <span id="clientCount" class="badge bg-gold text-dark">0</span>
+          </div>
+          <div class="client-list" id="clientList"></div>
+        </div>
+
+        <!-- ESTILOS -->
+        <div data-panel-view="styles" hidden>
+          <form class="client-form" id="styleForm">
+            <input type="hidden" id="styleId">
+            <h3 id="styleFormTitle">Agregar Nuevo Estilo</h3>
+            <div class="client-fields">
+              <div><label for="styleName">Nombre del estilo</label><input id="styleName" placeholder="Fade degradado con textura" required></div>
+              <div>
+                <label for="styleCategory">Categoría</label>
+                <select id="styleCategory" required>
+                  <option value="cortes">Cortes</option>
+                  <option value="barba">Barba</option>
+                  <option value="combos">Combos</option>
+                </select>
+              </div>
+              <div><label for="styleImage">Ruta o URL de imagen</label><input id="styleImage" placeholder="images/foto.jpg"></div>
+            </div>
+            <div class="client-form-actions">
+              <button type="submit" class="btn btn-zane" id="styleSubmit">Agregar Estilo</button>
+            </div>
+            <p class="admin-feedback" id="styleFeedback" role="status"></p>
+          </form>
+          <div class="admin-list-head mt-4"><h3>Catálogo de Estilos</h3></div>
+          <div class="client-list" id="stylesList"></div>
+        </div>
+
+        <!-- CAJA -->
+        <div data-panel-view="cash" hidden>
+          <form class="client-form" id="cashForm" onsubmit="return false;">
+            <h3>Cierre de Caja Diario</h3>
+            <div class="client-fields">
+              <div><label for="cashDate">Fecha de cierre</label><input id="cashDate" type="date"></div>
+              <div><label for="cashIncome">Ingresos totales ($ USD)</label><input id="cashIncome" type="number" min="0" step="0.01" value="0"></div>
+              <div><label for="cashTips">Propinas ($ USD)</label><input id="cashTips" type="number" min="0" step="0.01" value="0"></div>
+              <div><label for="cashNotes">Observaciones o notas</label><input id="cashNotes" placeholder="Servicios realizados, incidencias..."></div>
+            </div>
+            <div class="client-form-actions">
+              <button type="button" class="btn btn-zane" id="cashSave">Guardar Cierre de Caja</button>
+            </div>
+            <p class="admin-feedback" id="cashFeedback" role="status"></p>
+          </form>
+        </div>
+
+        <!-- CUMPLEAÑOS -->
+        <div data-panel-view="birthdays" hidden>
+          <div class="admin-list-head"><h3>Cumpleaños del Mes</h3></div>
+          <div class="client-list" id="birthdayList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer-zane">
+    <div class="container">
+      <div class="row gy-4">
+        <div class="col-lg-4">
+          <h5 class="brand-text">ZANE<span class="text-gold">BARBER</span></h5>
+          <p class="footer-desc mt-3">
+            Barbería de oficio en el Sector El Sisal, Guacara. Especialistas en corte clásico, fade contemporáneo y rituales de barba con navaja tradicional.
+          </p>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <h6 class="footer-heading">Navegación Rápida</h6>
+          <ul class="footer-links list-unstyled">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#servicios">Servicios & Tarifas</a></li>
+            <li><a href="#galeria">Galería de Trabajos</a></li>
+            <li><a href="#horarios">Horarios de Atención</a></li>
+            <li><a href="#contacto">Ubicación & Contacto</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <h6 class="footer-heading">Conéctate con Nosotros</h6>
+          <p class="footer-desc">Síguenos en nuestras redes para ver cortes diarios y novedades.</p>
+          <div class="social-icons">
+            <a href="https://www.instagram.com/zane_barberstudio" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/584121453691" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom mt-5 pt-4 border-top border-secondary border-opacity-25 d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <p class="mb-0 small text-muted">
+          © 2026 Zane Barber Studio. Todos los derechos reservados.
+        </p>
+        <span class="small text-gold-subtle">Hecho con oficio en Guacara, Carabobo</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Botones Flotantes -->
+  <div class="floating-actions" id="floatingActions">
+    <a href="#reserva" data-booking-open class="booking-float" aria-label="Reservar una cita" title="Reservar cita">
+      <i class="fas fa-calendar-check"></i>
+      <span class="float-tooltip">Agendar Cita</span>
+    </a>
+    <a href="https://wa.me/584121453691" target="_blank" rel="noopener" class="whatsapp-float" aria-label="Chatea por WhatsApp" title="WhatsApp directo">
+      <i class="fab fa-whatsapp"></i>
+      <span class="float-tooltip">WhatsApp</span>
+      <span class="float-ping"></span>
+    </a>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="js/vendor/bootstrap.bundle.min.js"></script>
+  <!-- Script personalizado -->
+  <script src="js/script.js"></script>
+</body>
+</html>

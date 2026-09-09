@@ -1,0 +1,2105 @@
+/* ==========================================================================
+   ZANE BARBER STUDIO — ESTILO PROFESIONAL DE AUTOR
+   Paleta: Azul Marino, Negro, Plata Hielo & Blanco
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. VARIABLES & DESIGN TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+  /* Fondos oscuros estructurados */
+  --zane-bg-main: #000000;
+  --zane-bg-surface: #0A2240;
+  --zane-bg-card: #102A4C;
+  --zane-bg-elevated: #1A3A63;
+  --zane-bg-glass: rgba(10, 34, 64, 0.85);
+
+  /* Acentos de redes sociales (sutiles, solo para identificación) */
+  --accent-whatsapp: #4FA684;
+  --accent-instagram: #B98BA6;
+
+  /* Acento de urgencia (panel admin: recordatorios pendientes) */
+  --accent-urgent: #D97757;
+  --accent-urgent-glow: rgba(217, 119, 87, 0.14);
+
+  /* Acentos Plata Hielo & Blanco */
+  --zane-gold: #C8D1DC;
+  --zane-gold-hover: #E4E9EE;
+  --zane-gold-light: #FFFFFF;
+  --zane-gold-dark: #8E9BAA;
+  --zane-gold-glow: rgba(200, 209, 220, 0.18);
+  --zane-gold-glow-strong: rgba(200, 209, 220, 0.35);
+
+  /* Azul de Marca — tono exacto del logo */
+  --azul-brand: #0A2240;
+  --azul-brand-bright: #3D6FA3;
+  --azul-brand-glow: rgba(10, 34, 64, 0.04);
+  --azul-brand-glow-soft: rgba(200, 209, 220, 0.05);
+  --azul-brand-border: rgba(200, 209, 220, 0.35);
+  --azul-brand-shadow: rgba(200, 209, 220, 0.15);
+
+  /* Tipografía y Textos */
+  --zane-text-main: #FFFFFF;
+  --zane-text-secondary: #C8D1DC;
+  --zane-text-muted: #8E9BAA;
+  --zane-text-dim: #7A8896;
+
+  /* Bordes sutiles */
+  --zane-border: rgba(255, 255, 255, 0.08);
+  --zane-border-gold: rgba(200, 209, 220, 0.22);
+  --zane-border-gold-subtle: rgba(200, 209, 220, 0.12);
+
+  /* Fuentes */
+  --zane-font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --zane-display: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Radios */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+
+  /* Sombras y elevaciones */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --shadow-gold: 0 8px 30px rgba(200, 209, 220, 0.2);
+
+  /* Transiciones */
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   2. RESET & ESTILOS BASE
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--zane-font);
+  background-color: var(--zane-bg-main);
+  color: var(--zane-text-main);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Scrollbar estilizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--zane-bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(200, 209, 220, 0.3);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--zane-gold);
+}
+
+/* Selección de texto */
+::selection {
+  background: rgba(200, 209, 220, 0.3);
+  color: #fff;
+}
+
+/* Tipografía de encabezados */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--zane-display);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--zane-text-main);
+  margin-top: 0;
+}
+
+p {
+  color: var(--zane-text-secondary);
+  font-size: 1rem;
+}
+
+a {
+  color: var(--zane-gold);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--zane-gold-hover);
+}
+
+/* Desplazamiento preciso con Navbar Sticky */
+section[id],
+header[id] {
+  scroll-margin-top: 85px;
+}
+
+/* --------------------------------------------------------------------------
+   3. CLASES UTILITARIAS Y COMPONENTES REUTILIZABLES
+   -------------------------------------------------------------------------- */
+.text-gold {
+  color: var(--zane-gold) !important;
+}
+
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, #C8D1DC 55%, #8E9BAA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.text-gold-subtle {
+  color: rgba(200, 209, 220, 0.7);
+}
+
+.bg-gold {
+  background-color: var(--zane-gold) !important;
+}
+
+.eyebrow {
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--zane-gold);
+  margin-bottom: 0.85rem;
+}
+
+.section {
+  padding: 5.5rem 0;
+  position: relative;
+}
+
+.section-head {
+  margin-bottom: 3.5rem;
+  position: relative;
+}
+
+.section-title {
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+
+.section-subtitle {
+  color: var(--zane-text-muted);
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   4. BOTONES DE AUTOR
+   -------------------------------------------------------------------------- */
+.btn-zane {
+  background: linear-gradient(135deg, #C8D1DC 0%, #8E9BAA 100%);
+  color: #000000 !important;
+  font-family: var(--zane-font);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  padding: 0.85rem 1.85rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 18px rgba(200, 209, 220, 0.28);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-zane:hover {
+  background: linear-gradient(135deg, #FFFFFF 0%, #C8D1DC 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(200, 209, 220, 0.42);
+  color: #000000 !important;
+}
+
+.btn-zane:active {
+  transform: translateY(0);
+}
+
+.btn-outline-zane {
+  background: rgba(200, 209, 220, 0.05);
+  border: 1px solid var(--zane-border-gold);
+  color: var(--zane-gold-light) !important;
+  font-family: var(--zane-font);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  padding: 0.85rem 1.85rem;
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-outline-zane:hover {
+  background: var(--zane-gold);
+  border-color: var(--zane-gold);
+  color: #000000 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 209, 220, 0.3);
+}
+
+.btn-outline-zane.rounded-circle {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50% !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. NAVBAR & BRAND
+   -------------------------------------------------------------------------- */
+.navbar-zane {
+  background: rgba(11, 12, 16, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--zane-border-gold-subtle);
+  padding: 0.85rem 0;
+  transition: all var(--transition-normal);
+  z-index: 1040;
+}
+
+.navbar-zane.scrolled {
+  background: rgba(11, 12, 16, 0.96);
+  border-bottom-color: var(--zane-border-gold);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  padding: 0.65rem 0;
+}
+
+.navbar-zane .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+}
+
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(200, 209, 220, 0.25));
+}
+
+.brand-text {
+  font-family: var(--zane-display);
+  font-weight: 800;
+  font-size: 1.55rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+  line-height: 1;
+}
+
+.brand-text span {
+  margin-left: 0.25rem;
+}
+
+/* Enlaces del Menú */
+.navbar-zane .nav-link {
+  font-weight: 600;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  color: var(--zane-text-secondary);
+  padding: 0.5rem 1rem !important;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.navbar-zane .nav-link:hover,
+.navbar-zane .nav-link.active {
+  color: var(--zane-gold);
+}
+
+.navbar-zane .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 1rem;
+  right: 1rem;
+  height: 2px;
+  background: var(--zane-gold);
+  border-radius: var(--radius-pill);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar-zane .nav-link:hover::after,
+.navbar-zane .nav-link.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.navbar-toggler {
+  border: 1px solid var(--zane-border-gold);
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm);
+  color: var(--zane-gold);
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 3px var(--zane-gold-glow);
+}
+
+.navbar-toggler-icon {
+  filter: invert(75%) sepia(50%) saturate(1000%) hue-rotate(5deg);
+}
+
+.admin-nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-pill);
+  color: var(--zane-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all var(--transition-fast);
+}
+
+.admin-nav-link:hover {
+  background: rgba(200, 209, 220, 0.15);
+  color: #fff;
+  border-color: var(--zane-gold);
+}
+
+/* --------------------------------------------------------------------------
+   6. HERO SECTION
+   -------------------------------------------------------------------------- */
+.hero-zane {
+  background: var(--zane-bg-main);
+  padding: 6.5rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* Luz ambiental sutil */
+.hero-ambient-glow {
+  position: absolute;
+  top: -150px;
+  right: -100px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(200, 209, 220, 0.14) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-zane::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to top, var(--zane-bg-main) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(200, 209, 220, 0.08);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-pill);
+  padding: 0.45rem 1.15rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--zane-gold-light);
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(8px);
+}
+
+.hero-title {
+  font-size: clamp(3.2rem, 7.5vw, 6.2rem);
+  font-weight: 800;
+  line-height: 0.92;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.hero-lead {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--zane-text-secondary);
+  max-width: 540px;
+  margin-bottom: 2rem;
+}
+
+/* Banner de Respaldo Eléctrico */
+.power-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  background: rgba(22, 25, 34, 0.85);
+  border: 1px solid var(--zane-border-gold);
+  border-left: 3px solid var(--zane-gold);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1.25rem;
+  max-width: 480px;
+  margin-bottom: 2.25rem;
+  backdrop-filter: blur(10px);
+}
+
+.power-banner-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  background: rgba(200, 209, 220, 0.12);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--zane-gold);
+  font-size: 1.1rem;
+}
+
+.power-banner-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.power-banner-content strong {
+  font-family: var(--zane-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.power-banner-content small {
+  font-size: 0.82rem;
+  color: var(--zane-text-muted);
+  line-height: 1.4;
+  margin-top: 0.15rem;
+}
+
+.hero-cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Imagen del Hero (Framing Editorial) */
+.hero-media {
+  position: relative;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.hero-media-backdrop {
+  position: absolute;
+  inset: -15px -15px 15px 15px;
+  background: linear-gradient(135deg, rgba(200, 209, 220, 0.25) 0%, transparent 60%);
+  border-radius: var(--radius-lg);
+  z-index: 0;
+  filter: blur(12px);
+}
+
+.hero-media-frame {
+  position: relative;
+  z-index: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--zane-border-gold);
+  background: var(--zane-bg-card);
+  box-shadow: var(--shadow-lg), var(--shadow-gold);
+}
+
+.hero-media-tag {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2;
+  background: rgba(11, 12, 16, 0.82);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-pill);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--zane-gold-light);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--zane-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--zane-gold);
+}
+
+.hero-image {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-media-frame:hover .hero-image {
+  transform: scale(1.03);
+}
+
+.hero-media-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 2.5rem 1.25rem 1rem;
+  background: linear-gradient(to top, rgba(11, 12, 16, 0.95) 0%, rgba(11, 12, 16, 0.6) 60%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-media-info strong {
+  font-family: var(--zane-display);
+  font-size: 1.25rem;
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hero-media-info small {
+  color: var(--zane-text-secondary);
+  font-size: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   7. CARTA DE SERVICIOS
+   -------------------------------------------------------------------------- */
+.services-section {
+  background: var(--zane-bg-surface);
+  border-top: 1px solid var(--zane-border);
+  border-bottom: 1px solid var(--zane-border);
+}
+
+.services-list {
+  max-width: 920px;
+  margin: 0 auto;
+  border-top: 1px solid var(--zane-border);
+}
+
+.service-row {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr) auto 50px;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.6rem 1.25rem;
+  border-bottom: 1px solid var(--zane-border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.service-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateX(4px);
+  border-color: var(--zane-border-gold);
+}
+
+.service-row--featured {
+  background: linear-gradient(90deg, rgba(200, 209, 220, 0.06) 0%, transparent 100%);
+  border-left: 2px solid var(--zane-gold);
+}
+
+.service-number {
+  font-family: var(--zane-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--zane-gold);
+  opacity: 0.85;
+}
+
+.service-copy h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.35rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.service-tag {
+  background: var(--zane-gold);
+  color: #000000;
+  font-family: var(--zane-font);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-pill);
+}
+
+.service-copy p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--zane-text-muted);
+}
+
+.service-sublist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.service-sublist li {
+  font-size: 0.88rem;
+  color: var(--zane-text-muted);
+  padding-left: 1.1rem;
+  position: relative;
+}
+
+.service-sublist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--zane-gold);
+}
+
+.service-sublist strong {
+  color: var(--zane-text-secondary);
+  font-weight: 700;
+}
+
+.service-price {
+  font-family: var(--zane-display);
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--zane-gold-light);
+  white-space: nowrap;
+}
+
+.service-price small {
+  font-size: 0.85rem;
+  color: var(--zane-text-muted);
+  font-weight: 600;
+  margin-left: 0.15rem;
+}
+
+.service-cta {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--zane-border-gold);
+  background: rgba(200, 209, 220, 0.06);
+  color: var(--zane-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.service-row:hover .service-cta {
+  background: var(--zane-gold);
+  color: #000000;
+  transform: scale(1.08);
+  box-shadow: 0 4px 15px rgba(200, 209, 220, 0.4);
+}
+
+.price-note {
+  color: var(--zane-text-muted);
+  font-size: 0.85rem;
+}
+
+.services-note {
+  color: var(--zane-text-secondary);
+  font-size: 0.95rem;
+}
+
+.wa-direct-link {
+  color: var(--zane-gold);
+  font-weight: 700;
+  margin-left: 0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.wa-direct-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   8. GALERÍA & LIGHTBOX
+   -------------------------------------------------------------------------- */
+.section--gallery {
+  background: var(--zane-bg-main);
+}
+
+.gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 2.5rem;
+}
+
+.gallery-filter {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  color: var(--zane-text-secondary);
+  font-family: var(--zane-font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.gallery-filter:hover {
+  border-color: var(--zane-border-gold);
+  color: #fff;
+}
+
+.gallery-filter.is-active {
+  background: var(--zane-gold);
+  border-color: var(--zane-gold);
+  color: #000000;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(200, 209, 220, 0.3);
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.gallery-item {
+  margin: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--zane-border);
+  background: var(--zane-bg-card);
+  aspect-ratio: 4 / 3;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.gallery-item.is-hidden {
+  display: none !important;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gallery-item:hover {
+  transform: translateY(-6px);
+  border-color: var(--zane-border-gold);
+  box-shadow: var(--shadow-gold);
+}
+
+.gallery-item:hover img {
+  transform: scale(1.06);
+}
+
+.gallery-item figcaption {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2.5rem 1.25rem 1rem;
+  background: linear-gradient(to top, rgba(11, 12, 16, 0.96) 0%, rgba(11, 12, 16, 0.6) 65%, transparent 100%);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-family: var(--zane-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transform: translateY(6px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.gallery-item:hover figcaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Lightbox Inmersivo */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(7, 8, 11, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: grid;
+  grid-template-columns: 60px minmax(0, 950px) 60px;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.lightbox.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-content {
+  margin: 0;
+  text-align: center;
+}
+
+.lightbox-content img {
+  max-width: 100%;
+  max-height: 76vh;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--zane-border-gold);
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(200, 209, 220, 0.2);
+}
+
+.lightbox-content figcaption {
+  margin-top: 1rem;
+  font-family: var(--zane-display);
+  font-size: 1.6rem;
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lightbox-content span {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--zane-gold);
+  margin-top: 0.25rem;
+  letter-spacing: 0.1em;
+}
+
+.lightbox button {
+  width: 50px;
+  height: 50px;
+  border: 1px solid var(--zane-border-gold);
+  border-radius: 50%;
+  background: rgba(22, 25, 34, 0.85);
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox button:hover {
+  background: var(--zane-gold);
+  color: #000000;
+  transform: scale(1.1);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  border: none !important;
+  font-size: 2rem !important;
+  background: transparent !important;
+  color: #fff !important;
+}
+
+.lightbox-close:hover {
+  color: var(--zane-gold) !important;
+}
+
+/* --------------------------------------------------------------------------
+   9. TESTIMONIOS (RESEÑAS EDITORIALES)
+   -------------------------------------------------------------------------- */
+.testimonials-section {
+  background: var(--zane-bg-surface);
+  border-top: 1px solid var(--zane-border);
+  border-bottom: 1px solid var(--zane-border);
+}
+
+.testimonials-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 4.5rem;
+  align-items: center;
+}
+
+.testimonial {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border-gold-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.75rem 2.5rem;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  min-height: 250px;
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.testimonial:hover {
+  border-color: var(--azul-brand-border);
+  box-shadow: 0 10px 28px var(--azul-brand-shadow);
+}
+
+.testimonial-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.testimonial-avatar-monogram {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(200, 209, 220, 0.25) 0%, rgba(200, 209, 220, 0.05) 100%);
+  border: 2px solid var(--zane-gold);
+  color: var(--zane-gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--zane-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 12px rgba(200, 209, 220, 0.2);
+}
+
+.testimonial-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.client-name {
+  font-family: var(--zane-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.client-badge {
+  font-size: 0.72rem;
+  color: var(--zane-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.testimonial-stars {
+  color: var(--zane-gold);
+  font-size: 0.85rem;
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.testimonial p {
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: var(--zane-text-main);
+  margin-bottom: 0;
+  font-style: italic;
+}
+
+.testimonials-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.testimonials-section .carousel-control-prev,
+.testimonials-section .carousel-control-next {
+  position: static;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--zane-border-gold);
+  background: var(--zane-bg-card);
+  color: var(--zane-gold);
+  opacity: 1;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.testimonials-section .carousel-control-prev:hover,
+.testimonials-section .carousel-control-next:hover {
+  background: var(--zane-gold);
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.testimonials-section .carousel-indicators {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   10. ESTADÍSTICAS
+   -------------------------------------------------------------------------- */
+.stats-section {
+  padding: 4rem 0;
+  background: var(--zane-bg-main);
+  border-bottom: 1px solid var(--zane-border);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.stat {
+  text-align: center;
+  padding: 1rem;
+  border-right: 1px solid var(--zane-border);
+}
+
+.stat:last-child {
+  border-right: none;
+}
+
+.stat strong {
+  display: block;
+  font-family: var(--zane-display);
+  font-size: 4rem;
+  font-weight: 800;
+  line-height: 0.9;
+  color: var(--zane-gold);
+}
+
+.stat span {
+  display: block;
+  margin-top: 0.65rem;
+  color: var(--zane-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   11. PREGUNTAS FRECUENTES (FAQ)
+   -------------------------------------------------------------------------- */
+.faq-section {
+  background: var(--zane-bg-surface);
+}
+
+.faq-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 4.5rem;
+  align-items: start;
+}
+
+.faq-section .accordion-item {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-md) !important;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-section .accordion-item:hover {
+  border-color: var(--azul-brand-border);
+  box-shadow: 0 8px 24px var(--azul-brand-shadow);
+}
+
+.faq-section .accordion-button {
+  background: var(--zane-bg-card);
+  color: #fff;
+  font-family: var(--zane-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 1.4rem 1.6rem;
+  box-shadow: none !important;
+  border: none;
+}
+
+.faq-section .accordion-button:not(.collapsed) {
+  color: var(--zane-gold);
+  background: rgba(200, 209, 220, 0.04);
+}
+
+.faq-section .accordion-button::after {
+  filter: invert(75%) sepia(50%) saturate(1000%) hue-rotate(5deg);
+}
+
+.faq-section .accordion-body {
+  padding: 0 1.6rem 1.6rem;
+  color: var(--zane-text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.7;
+}
+
+/* --------------------------------------------------------------------------
+   12. HORARIOS DE ATENCIÓN
+   -------------------------------------------------------------------------- */
+.hours-section {
+  background: var(--zane-bg-main);
+  border-top: 1px solid var(--zane-border);
+  border-bottom: 1px solid var(--zane-border);
+  position: relative;
+}
+
+.hours-card {
+  max-width: 580px;
+  margin: 2.5rem auto 0;
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2.25rem;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.3s ease;
+}
+
+.hours-card:hover {
+  border-color: var(--azul-brand-border);
+  box-shadow: 0 10px 28px var(--azul-brand-shadow);
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--zane-border);
+}
+
+.hours-row:last-child {
+  border-bottom: none;
+}
+
+.hours-day {
+  font-family: var(--zane-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.hours-value {
+  font-weight: 600;
+  color: var(--zane-gold-light);
+  font-size: 1.05rem;
+}
+
+.badge-closed {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--zane-text-muted);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.power-note {
+  max-width: 440px;
+  background: rgba(22, 25, 34, 0.8);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-pill);
+  padding: 0.65rem 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: left;
+}
+
+.power-note i {
+  font-size: 1.25rem;
+}
+
+.power-note span {
+  display: flex;
+  flex-direction: column;
+}
+
+.power-note strong {
+  font-family: var(--zane-display);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.power-note small {
+  font-size: 0.78rem;
+  color: var(--zane-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   13. CONTACTO & UBICACIÓN
+   -------------------------------------------------------------------------- */
+.section--contact {
+  background: var(--zane-bg-surface);
+}
+
+.contact-shell {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border-gold-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.contact-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.contact-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.contact-icon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 50%;
+  background: rgba(200, 209, 220, 0.1);
+  border: 1px solid var(--zane-border-gold);
+  color: var(--zane-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.contact-icon .fa-whatsapp {
+  color: var(--accent-whatsapp);
+}
+
+.contact-icon .fa-instagram {
+  color: var(--accent-instagram);
+}
+
+.contact-list strong {
+  display: block;
+  font-family: var(--zane-display);
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.contact-list span,
+.contact-list a {
+  color: var(--zane-text-secondary);
+  font-size: 0.92rem;
+}
+
+.contact-actions {
+  display: flex;
+  gap: 0.85rem;
+}
+
+.map-container {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--zane-border);
+}
+
+.map-scroll-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   14. MODAL DE RESERVA
+   -------------------------------------------------------------------------- */
+.booking-modal .modal-content {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-lg);
+  color: #fff;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+}
+
+.booking-modal .modal-header {
+  border-bottom: 1px solid var(--zane-border);
+  padding: 1.5rem 1.75rem;
+}
+
+.booking-modal .modal-title {
+  font-size: 2.2rem;
+  margin: 0;
+}
+
+.booking-modal .modal-body {
+  padding: 1.75rem;
+}
+
+.booking-fields {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.booking-fields label {
+  color: var(--zane-gold-light);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 0.75rem;
+}
+
+.booking-fields select,
+.booking-fields input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  background: var(--zane-bg-surface);
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: var(--zane-font);
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+
+.booking-fields select:focus,
+.booking-fields input:focus {
+  border-color: var(--zane-gold);
+  box-shadow: 0 0 0 3px var(--zane-gold-glow);
+  outline: none;
+}
+
+.booking-fields select option {
+  background: var(--zane-bg-card);
+  color: #fff;
+}
+
+.booking-summary {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1.5rem;
+  padding: 1.15rem;
+  background: rgba(200, 209, 220, 0.08);
+  border-left: 3px solid var(--zane-gold);
+  border-radius: var(--radius-xs);
+}
+
+.booking-summary span {
+  color: var(--zane-gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.booking-summary strong {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+.booking-error {
+  min-height: 1.25rem;
+  margin: 0.75rem 0 0;
+  color: #e57373;
+  font-size: 0.85rem;
+}
+
+.booking-modal .modal-footer {
+  border-top: 1px solid var(--zane-border);
+  padding: 1.25rem 1.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   15. PANEL DE ADMINISTRACIÓN (INTERNO)
+   -------------------------------------------------------------------------- */
+.admin-section {
+  padding: 5rem 0;
+  background: var(--zane-bg-surface);
+  border-top: 1px solid var(--zane-border);
+}
+
+.admin-section .container {
+  max-width: 1200px;
+}
+
+.admin-login {
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.admin-login-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.admin-login-form input {
+  min-height: 48px;
+  background: var(--zane-bg-surface);
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 0.75rem 1rem;
+}
+
+.admin-login-form input:focus {
+  border-color: var(--zane-gold);
+  outline: none;
+}
+
+.admin-dashboard {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-areas:
+    "heading heading"
+    "toolbar toolbar"
+    "tabs    content";
+  gap: 0.5rem 2rem;
+}
+
+.admin-heading {
+  grid-area: heading;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--zane-border);
+}
+
+.admin-toolbar {
+  grid-area: toolbar;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-dash-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.dash-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-stat strong {
+  font-family: var(--zane-font);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 1.9rem;
+  color: var(--zane-gold);
+  line-height: 1;
+}
+
+.dash-stat span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--zane-text-muted);
+  margin-top: 0.3rem;
+}
+
+/* Sidebar de navegación del panel (columna izquierda) */
+.admin-tabs {
+  grid-area: tabs;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-self: start;
+  position: sticky;
+  top: 90px;
+}
+
+.admin-tab {
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--zane-text-muted);
+  font-family: var(--zane-font);
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.admin-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-tab.is-active {
+  color: var(--zane-gold);
+  border-left-color: var(--zane-gold);
+  background: rgba(200, 209, 220, 0.07);
+}
+
+.tab-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--zane-text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.5rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.admin-tab.is-active .tab-count {
+  color: #000;
+  background: var(--zane-gold);
+}
+
+.tab-count.has-urgent {
+  color: #fff;
+  background: var(--accent-urgent);
+}
+
+.admin-tab.is-active .tab-count.has-urgent {
+  color: #fff;
+  background: var(--accent-urgent);
+}
+
+[data-panel-view] {
+  grid-area: content;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .admin-dashboard {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "heading"
+      "toolbar"
+      "tabs"
+      "content";
+    padding: 1.5rem;
+  }
+
+  .admin-tabs {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--zane-border);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .admin-tab {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    white-space: nowrap;
+  }
+
+  .admin-tab.is-active {
+    border-left-color: transparent;
+    border-bottom-color: var(--zane-gold);
+  }
+}
+
+.client-form {
+  background: var(--zane-bg-surface);
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-md);
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.client-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.client-fields label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--zane-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.client-fields input,
+.client-fields select,
+.client-tools input,
+.client-tools select,
+.message-template textarea {
+  width: 100%;
+  min-height: 44px;
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 0.65rem 0.85rem;
+  font-family: var(--zane-font);
+}
+
+.client-fields input:focus,
+.client-fields select:focus,
+.client-tools input:focus,
+.client-tools select:focus,
+.message-template textarea:focus {
+  border-color: var(--zane-gold);
+  outline: none;
+}
+
+.client-tools {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.client-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.client-item {
+  background: var(--zane-bg-surface);
+  border: 1px solid var(--zane-border);
+  border-left: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.client-item h4 {
+  font-family: var(--zane-font);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.2rem;
+}
+
+.client-item p {
+  font-size: 0.85rem;
+  color: var(--zane-text-muted);
+  margin: 0;
+}
+
+.client-item.is-pending {
+  border-left-color: var(--accent-urgent);
+  background: linear-gradient(90deg, var(--accent-urgent-glow) 0%, var(--zane-bg-surface) 18%);
+}
+
+.client-reminder {
+  font-size: 0.85rem;
+  color: var(--zane-text-secondary);
+  text-align: right;
+}
+
+.client-reminder strong {
+  display: block;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.pending-badge {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--accent-urgent);
+  border-radius: var(--radius-pill);
+  padding: 0.2rem 0.6rem;
+}
+
+.client-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.client-actions button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--zane-border);
+  background: var(--zane-bg-card);
+  color: var(--zane-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.client-actions button:hover {
+  border-color: var(--zane-gold);
+  color: var(--zane-gold);
+}
+
+.client-actions button[data-client-action="send"]:hover,
+.client-actions button[data-client-action="send-birthday"]:hover {
+  border-color: var(--accent-whatsapp);
+  color: var(--accent-whatsapp);
+}
+
+.client-actions button[data-client-action="delete"]:hover,
+.client-actions button[data-style-action="delete"]:hover {
+  border-color: var(--accent-urgent);
+  color: var(--accent-urgent);
+}
+
+.admin-empty {
+  text-align: center;
+  color: var(--zane-text-muted);
+  font-size: 0.9rem;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--zane-border);
+  border-radius: var(--radius-sm);
+  margin-top: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   16. FOOTER
+   -------------------------------------------------------------------------- */
+.footer-zane {
+  background: var(--zane-bg-main);
+  border-top: 1px solid var(--zane-border);
+  padding: 4.5rem 0 2.5rem;
+}
+
+.footer-heading {
+  font-family: var(--zane-display);
+  font-size: 1.2rem;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
+}
+
+.footer-desc {
+  color: var(--zane-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.footer-links li {
+  margin-bottom: 0.65rem;
+}
+
+.footer-links a {
+  color: var(--zane-text-muted);
+  font-size: 0.92rem;
+  transition: color var(--transition-fast);
+}
+
+.footer-links a:hover {
+  color: var(--zane-gold);
+}
+
+.social-icons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.social-icons a {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  color: var(--zane-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all var(--transition-fast);
+}
+
+.social-icons a .fa-whatsapp {
+  color: var(--accent-whatsapp);
+}
+
+.social-icons a .fa-instagram {
+  color: var(--accent-instagram);
+}
+
+.social-icons a:hover {
+  background: var(--zane-gold);
+  border-color: var(--zane-gold);
+  color: #000000;
+  transform: translateY(-2px);
+}
+
+.social-icons a:hover i {
+  color: #000000;
+}
+
+/* --------------------------------------------------------------------------
+   17. BOTONES FLOTANTES
+   -------------------------------------------------------------------------- */
+.floating-actions {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  z-index: 1020;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.booking-float,
+.whatsapp-float {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  font-size: 1.35rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.booking-float {
+  background: linear-gradient(135deg, #FFFFFF 0%, #C8D1DC 100%);
+}
+
+.whatsapp-float {
+  background: var(--accent-whatsapp);
+  color: #fff;
+}
+
+.booking-float:hover,
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.float-tooltip {
+  position: absolute;
+  right: 66px;
+  background: rgba(11, 12, 16, 0.95);
+  border: 1px solid var(--zane-border-gold);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: all var(--transition-fast);
+}
+
+.booking-float:hover .float-tooltip,
+.whatsapp-float:hover .float-tooltip {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.float-ping {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background: var(--accent-whatsapp);
+  border: 2px solid #000000;
+  border-radius: 50%;
+}
+
+/* --------------------------------------------------------------------------
+   18. RESPONSIVIDAD & ADAPTACIONES MÓVILES
+   -------------------------------------------------------------------------- */
+@media (max-width: 991px) {
+  .hero-zane {
+    padding: 5.5rem 0 3.5rem;
+  }
+
+  .testimonials-layout,
+  .faq-layout {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 2rem;
+  }
+
+  .stat:nth-child(2) {
+    border-right: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    padding: 4rem 0;
+  }
+
+  .service-row {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+    gap: 1rem;
+  }
+
+  .service-row .service-cta {
+    display: none;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .stat {
+    border-right: none;
+    border-bottom: 1px solid var(--zane-border);
+    padding-bottom: 1.5rem;
+  }
+
+  .stat:last-child {
+    border-bottom: none;
+  }
+
+  .floating-actions {
+    right: 18px;
+    bottom: 18px;
+  }
+
+  .booking-float,
+  .whatsapp-float {
+    width: 48px;
+    height: 48px;
+    font-size: 1.15rem;
+  }
+
+  .map-scroll-shield {
+    display: block;
+  }
+}

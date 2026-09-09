@@ -1,0 +1,9 @@
+node_modules/
+
+# Datos reales de clientes y secretos — nunca deben versionarse ni compartirse
+data/
+*.sqlite
+*.secret
+
+.env
+.env.local
