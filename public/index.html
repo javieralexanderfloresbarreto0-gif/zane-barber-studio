@@ -7,16 +7,16 @@
   <title>Zane Barber Studio | Barbería de Autor en Guacara, Carabobo</title>
 
   <!-- Favicon / Brand icons -->
-  <link rel="icon" type="image/png" href="images/logo.png">
+  <link rel="icon" type="image/png" href="img/logo.png">
 
   <!-- Tipografías locales: Barlow Condensed & DM Sans -->
-  <link href="css/fonts/fonts.css" rel="stylesheet">
+  <link href="vendor/fonts/fonts.css" rel="stylesheet">
 
   <!-- Bootstrap 5 CSS (local) -->
-  <link href="css/vendor/bootstrap.min.css" rel="stylesheet">
+  <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
 
   <!-- Font Awesome 6.5.1 (local) -->
-  <link rel="stylesheet" href="css/fa/all.min.css">
+  <link rel="stylesheet" href="vendor/fontawesome/all.min.css">
 
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="css/custom.css">
@@ -27,7 +27,7 @@
   <nav class="navbar navbar-expand-lg navbar-zane sticky-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand" href="#inicio">
-        <img src="images/logo.png" alt="Logo de Zane Barber Studio" class="brand-logo">
+        <img src="img/logo.png" alt="Logo de Zane Barber Studio" class="brand-logo">
         <span class="brand-text">ZANE<span class="text-gold">BARBER</span></span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navZane" aria-controls="navZane" aria-expanded="false" aria-label="Toggle navigation">
@@ -146,7 +146,7 @@
                 <span class="pulse-dot"></span>
                 <span>Trabajo Real / 01</span>
               </div>
-              <img src="images/Imagen pegada.png" alt="Corte realizado en Zane Barber Studio" class="hero-image shadow-lg">
+              <img src="img/hero.png" alt="Corte realizado en Zane Barber Studio" class="hero-image shadow-lg">
               <div class="hero-media-info">
                 <strong>Zane Barber Studio</strong>
                 <small><i class="fas fa-map-marker-alt text-gold me-1"></i> El Sisal, Guacara</small>
@@ -267,32 +267,32 @@
 
       <div class="gallery-grid">
         <figure class="gallery-item" data-category="combos" tabindex="0">
-          <img src="images/Imagen de persona recortandose y tomando cafe.jpeg" alt="Cliente en la silla de Zane Barber Studio disfrutando de café de cortesía" loading="lazy">
+          <img src="img/galeria/cafe-cortesia.jpeg" alt="Cliente en la silla de Zane Barber Studio disfrutando de café de cortesía" loading="lazy">
           <figcaption>Corte & Café de Cortesía</figcaption>
         </figure>
 
         <figure class="gallery-item" data-category="cortes" tabindex="0">
-          <img src="images/Imagen de un corte.jpeg" alt="Fade degradado al detalle en Zane Barber Studio" loading="lazy">
+          <img src="img/galeria/fade-detalle.jpeg" alt="Fade degradado al detalle en Zane Barber Studio" loading="lazy">
           <figcaption>Degradado Fade al Detalle</figcaption>
         </figure>
 
         <figure class="gallery-item" data-category="barba" tabindex="0">
-          <img src="images/Imagen del barbero haciendo una barba (2).png" alt="Perfilado y ritual de barba en Zane Barber Studio" loading="lazy">
+          <img src="img/galeria/ritual-barba.png" alt="Perfilado y ritual de barba en Zane Barber Studio" loading="lazy">
           <figcaption>Ritual de Barba & Navaja</figcaption>
         </figure>
 
         <figure class="gallery-item" data-category="combos" tabindex="0">
-          <img src="images/Imagen del Lobby de la barberia.jpeg" alt="Lobby y sala de espera de Zane Barber Studio" loading="lazy">
+          <img src="img/galeria/zona-lounge.jpeg" alt="Lobby y sala de espera de Zane Barber Studio" loading="lazy">
           <figcaption>Zona Lounge & Espera</figcaption>
         </figure>
 
         <figure class="gallery-item" data-category="cortes" tabindex="0">
-          <img src="images/Imagen de un cabello pintado de blanco.png" alt="Diseño de color y platinado en Zane Barber Studio" loading="lazy">
+          <img src="img/galeria/colorimetria-platinado.png" alt="Diseño de color y platinado en Zane Barber Studio" loading="lazy">
           <figcaption>Colorimetría & Platinado</figcaption>
         </figure>
 
         <figure class="gallery-item" data-category="combos" tabindex="0">
-          <img src="images/Imagen de la recepcion enfocando un pcoo mas el logo de la barberia.jpeg" alt="Recepción con el logo insignia de Zane Barber Studio" loading="lazy">
+          <img src="img/galeria/recepcion.jpeg" alt="Recepción con el logo insignia de Zane Barber Studio" loading="lazy">
           <figcaption>Recepción Zane Studio</figcaption>
         </figure>
       </div>
@@ -739,7 +739,7 @@
                   <option value="combos">Combos</option>
                 </select>
               </div>
-              <div><label for="styleImage">Ruta o URL de imagen</label><input id="styleImage" placeholder="images/foto.jpg"></div>
+              <div><label for="styleImage">Ruta o URL de imagen</label><input id="styleImage" placeholder="img/galeria/foto.jpg"></div>
             </div>
             <div class="client-form-actions">
               <button type="submit" class="btn btn-zane" id="styleSubmit">Agregar Estilo</button>
@@ -828,7 +828,7 @@
   </div>
 
   <!-- Bootstrap 5 JS Bundle -->
-  <script src="js/vendor/bootstrap.bundle.min.js"></script>
+  <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
   <!-- Script personalizado -->
   <script src="js/script.js"></script>
 </body>

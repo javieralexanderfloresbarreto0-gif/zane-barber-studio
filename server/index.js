@@ -6,7 +6,9 @@ const Database = require('better-sqlite3');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
-const dataDirectory = path.join(__dirname, 'data');
+const rootDirectory = path.join(__dirname, '..');
+const publicDirectory = path.join(rootDirectory, 'public');
+const dataDirectory = path.join(rootDirectory, 'data');
 const databasePath = path.join(dataDirectory, 'zane.sqlite');
 const tokenSecretPath = path.join(dataDirectory, 'token.secret');
 const adminPasswordPath = path.join(dataDirectory, 'admin_password.secret');
@@ -45,8 +47,8 @@ function loadTokenSecret() {
 const TOKEN_SECRET = loadTokenSecret();
 const database = new Database(databasePath);
 database.pragma('foreign_keys = ON');
-database.exec(fs.readFileSync(path.join(__dirname, 'db', 'schema.sql'), 'utf8'));
-database.exec(fs.readFileSync(path.join(__dirname, 'db', 'seed.sql'), 'utf8'));
+database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'schema.sql'), 'utf8'));
+database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'seed.sql'), 'utf8'));
 
 app.use(express.json({ limit: '1mb' }));
 app.use((request, response, next) => {
@@ -56,9 +58,8 @@ app.use((request, response, next) => {
   response.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   next();
 });
-app.use('/css', express.static(path.join(__dirname, 'css')));
-app.use('/js', express.static(path.join(__dirname, 'js')));
-app.use('/images', express.static(path.join(__dirname, 'images')));
+// Todos los archivos estáticos del sitio viven en public/ (index.html, css, js, img, vendor)
+app.use(express.static(publicDirectory));
 
 app.use((request, response, next) => {
   const blocked = ['/data', '/db', '/node_modules'];
@@ -69,11 +70,11 @@ app.use((request, response, next) => {
 });
 
 app.get(['/', '/index.html'], (request, response) => {
-  response.sendFile(path.join(__dirname, 'index.html'));
+  response.sendFile(path.join(publicDirectory, 'index.html'));
 });
 
 app.get(['/admin', '/admin/', '/admin/index.html'], (request, response) => {
-  response.sendFile(path.join(__dirname, 'index.html'));
+  response.sendFile(path.join(publicDirectory, 'index.html'));
 });
 
 function requireFields(body, fields) {

@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "Panel local de gestión para Zane Barber Studio",
-  "main": "server.js",
+  "main": "server/index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.8.1",
