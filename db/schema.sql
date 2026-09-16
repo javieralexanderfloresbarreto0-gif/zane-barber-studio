@@ -52,6 +52,12 @@ CREATE TABLE IF NOT EXISTS cash_closures (
   CHECK (tips_cents <= gross_income_cents)
 );
 
+CREATE TABLE IF NOT EXISTS app_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_clients_birth_month ON clients (birth_date);
 CREATE INDEX IF NOT EXISTS idx_clients_last_cut ON clients (last_cut_date);
 CREATE INDEX IF NOT EXISTS idx_preferences_client ON haircut_preferences (client_id);

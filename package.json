@@ -6,10 +6,15 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node --watch server/index.js"
+    "dev": "node --watch server/index.js",
+    "check": "node --check server/index.js && node --check server/kiosc/mount.js && node --check public/js/script.js && node --check public/js/board.js && node --check public/kiosc/kiosc.js && node --check public/kiosc/sw.js"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "better-sqlite3": "^11.8.1",
+    "compression": "^1.8.1",
     "express": "^4.22.2"
   }
 }

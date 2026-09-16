@@ -1,18 +1,19 @@
 /* ==========================================================================
    ZANE BARBER STUDIO — ESTILO PROFESIONAL DE AUTOR
-   Paleta: Azul Marino, Negro, Plata Hielo & Blanco
+   Paleta: azul marino (#0B1F45) dominante como fondo + plata (#C8C7C9) como acento,
+   con blanco (#FFFFFF) y negro (#000000) como polos de contraste; grafito (#8E8E90) de apoyo
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
    1. VARIABLES & DESIGN TOKENS
    -------------------------------------------------------------------------- */
 :root {
-  /* Fondos oscuros estructurados */
-  --zane-bg-main: #000000;
-  --zane-bg-surface: #0A2240;
-  --zane-bg-card: #102A4C;
-  --zane-bg-elevated: #1A3A63;
-  --zane-bg-glass: rgba(10, 34, 64, 0.85);
+  /* Fondos: azul marino de la paleta como superficie dominante, sobre grafito casi negro */
+  --zane-bg-main: #0F1115;
+  --zane-bg-surface: #0B1F45;
+  --zane-bg-card: #122A50;
+  --zane-bg-elevated: #213A63;
+  --zane-bg-glass: rgba(11, 31, 69, 0.85);
 
   /* Acentos de redes sociales (sutiles, solo para identificación) */
   --accent-whatsapp: #4FA684;
@@ -22,32 +23,35 @@
   --accent-urgent: #D97757;
   --accent-urgent-glow: rgba(217, 119, 87, 0.14);
 
-  /* Acentos Plata Hielo & Blanco */
-  --zane-gold: #C8D1DC;
-  --zane-gold-hover: #E4E9EE;
+  /* Acento principal: plata sobre el marino (9.6:1 de contraste).
+     --zane-gold-rgb es la fuente única de canal para todos los rgba() de acento. */
+  --zane-gold: #C8C7C9;
+  --zane-gold-rgb: 200, 199, 201;
+  --zane-gold-hover: #E4E4E6;
   --zane-gold-light: #FFFFFF;
-  --zane-gold-dark: #8E9BAA;
-  --zane-gold-glow: rgba(200, 209, 220, 0.18);
-  --zane-gold-glow-strong: rgba(200, 209, 220, 0.35);
+  --zane-gold-dark: #8E8E90;
+  --zane-gold-glow: rgba(var(--zane-gold-rgb), 0.18);
+  --zane-gold-glow-strong: rgba(var(--zane-gold-rgb), 0.35);
 
-  /* Azul de Marca — tono exacto del logo */
-  --azul-brand: #0A2240;
-  --azul-brand-bright: #3D6FA3;
-  --azul-brand-glow: rgba(10, 34, 64, 0.04);
-  --azul-brand-glow-soft: rgba(200, 209, 220, 0.05);
-  --azul-brand-border: rgba(200, 209, 220, 0.35);
-  --azul-brand-shadow: rgba(200, 209, 220, 0.15);
+  /* Polo oscuro — negro/grafito para rellenos con texto claro (ej. botón confirmar del tablero) */
+  --azul-brand: #1C1C1E;
+  --azul-brand-bright: #3A3A3C;
+  --azul-brand-glow: rgba(0, 0, 0, 0.18);
+  --azul-brand-glow-soft: rgba(var(--zane-gold-rgb), 0.05);
+  --azul-brand-border: rgba(var(--zane-gold-rgb), 0.35);
+  --azul-brand-shadow: rgba(var(--zane-gold-rgb), 0.15);
 
-  /* Tipografía y Textos */
+  /* Tipografía y Textos: plata y grafito de la paleta sobre el marino.
+     --zane-text-muted subido a ~4.7:1 sobre --zane-bg-surface (WCAG AA). */
   --zane-text-main: #FFFFFF;
-  --zane-text-secondary: #C8D1DC;
-  --zane-text-muted: #8E9BAA;
-  --zane-text-dim: #7A8896;
+  --zane-text-secondary: #C8C7C9;
+  --zane-text-muted: #9EA0A6;
+  --zane-text-dim: #83858F;
 
   /* Bordes sutiles */
   --zane-border: rgba(255, 255, 255, 0.08);
-  --zane-border-gold: rgba(200, 209, 220, 0.22);
-  --zane-border-gold-subtle: rgba(200, 209, 220, 0.12);
+  --zane-border-gold: rgba(var(--zane-gold-rgb), 0.22);
+  --zane-border-gold-subtle: rgba(var(--zane-gold-rgb), 0.12);
 
   /* Fuentes */
   --zane-font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -64,7 +68,7 @@
   --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.55);
-  --shadow-gold: 0 8px 30px rgba(200, 209, 220, 0.2);
+  --shadow-gold: 0 8px 30px rgba(var(--zane-gold-rgb), 0.2);
 
   /* Transiciones */
   --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -102,7 +106,7 @@ body {
   background: var(--zane-bg-main);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(200, 209, 220, 0.3);
+  background: rgba(var(--zane-gold-rgb), 0.3);
   border-radius: var(--radius-pill);
 }
 ::-webkit-scrollbar-thumb:hover {
@@ -111,7 +115,7 @@ body {
 
 /* Selección de texto */
 ::selection {
-  background: rgba(200, 209, 220, 0.3);
+  background: rgba(var(--zane-gold-rgb), 0.3);
   color: #fff;
 }
 
@@ -154,14 +158,14 @@ header[id] {
 }
 
 .text-gold-gradient {
-  background: linear-gradient(135deg, #FFFFFF 0%, #C8D1DC 55%, #8E9BAA 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #C8C7C9 50%, #8E8E90 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
 }
 
 .text-gold-subtle {
-  color: rgba(200, 209, 220, 0.7);
+  color: rgba(var(--zane-gold-rgb), 0.7);
 }
 
 .bg-gold {
@@ -195,7 +199,7 @@ header[id] {
 }
 
 .section-subtitle {
-  color: var(--zane-text-muted);
+  color: var(--zane-text-secondary);
   max-width: 620px;
   margin: 0 auto;
   font-size: 1.05rem;
@@ -206,7 +210,7 @@ header[id] {
    4. BOTONES DE AUTOR
    -------------------------------------------------------------------------- */
 .btn-zane {
-  background: linear-gradient(135deg, #C8D1DC 0%, #8E9BAA 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #C8C7C9 100%);
   color: #000000 !important;
   font-family: var(--zane-font);
   font-weight: 700;
@@ -216,7 +220,7 @@ header[id] {
   padding: 0.85rem 1.85rem;
   border: none;
   border-radius: var(--radius-pill);
-  box-shadow: 0 4px 18px rgba(200, 209, 220, 0.28);
+  box-shadow: 0 4px 18px rgba(var(--zane-gold-rgb), 0.28);
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
@@ -225,18 +229,19 @@ header[id] {
 }
 
 .btn-zane:hover {
-  background: linear-gradient(135deg, #FFFFFF 0%, #C8D1DC 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #E4E4E6 100%);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(200, 209, 220, 0.42);
+  box-shadow: 0 8px 25px rgba(var(--zane-gold-rgb), 0.5);
   color: #000000 !important;
 }
 
 .btn-zane:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.96);
+  transition: transform 100ms ease-out;
 }
 
 .btn-outline-zane {
-  background: rgba(200, 209, 220, 0.05);
+  background: rgba(var(--zane-gold-rgb), 0.05);
   border: 1px solid var(--zane-border-gold);
   color: var(--zane-gold-light) !important;
   font-family: var(--zane-font);
@@ -259,7 +264,12 @@ header[id] {
   border-color: var(--zane-gold);
   color: #000000 !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(200, 209, 220, 0.3);
+  box-shadow: 0 6px 20px rgba(var(--zane-gold-rgb), 0.3);
+}
+
+.btn-outline-zane:active {
+  transform: translateY(0) scale(0.96);
+  transition: transform 100ms ease-out;
 }
 
 .btn-outline-zane.rounded-circle {
@@ -282,6 +292,24 @@ header[id] {
   z-index: 1040;
 }
 
+/* En móvil el menú desplegable se contiene como panel propio */
+@media (max-width: 991.98px) {
+  .navbar-zane .navbar-collapse {
+    margin-top: 0.85rem;
+    padding: 0.75rem 1rem 1rem;
+    background: rgba(11, 12, 16, 0.98);
+    border: 1px solid var(--zane-border-gold-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5);
+  }
+
+  .navbar-zane .nav-actions {
+    margin-top: 0.5rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--zane-border);
+  }
+}
+
 .navbar-zane.scrolled {
   background: rgba(11, 12, 16, 0.96);
   border-bottom-color: var(--zane-border-gold);
@@ -301,7 +329,7 @@ header[id] {
   width: 44px;
   height: 44px;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(200, 209, 220, 0.25));
+  filter: drop-shadow(0 2px 8px rgba(var(--zane-gold-rgb), 0.25));
 }
 
 .brand-text {
@@ -365,7 +393,7 @@ header[id] {
 }
 
 .navbar-toggler-icon {
-  filter: invert(75%) sepia(50%) saturate(1000%) hue-rotate(5deg);
+  filter: brightness(0) invert(0.82);
 }
 
 .admin-nav-link {
@@ -383,7 +411,7 @@ header[id] {
 }
 
 .admin-nav-link:hover {
-  background: rgba(200, 209, 220, 0.15);
+  background: rgba(var(--zane-gold-rgb), 0.15);
   color: #fff;
   border-color: var(--zane-gold);
 }
@@ -407,7 +435,7 @@ header[id] {
   right: -100px;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(200, 209, 220, 0.14) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--zane-gold-rgb), 0.14) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -427,7 +455,7 @@ header[id] {
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  background: rgba(200, 209, 220, 0.08);
+  background: rgba(var(--zane-gold-rgb), 0.08);
   border: 1px solid var(--zane-border-gold);
   border-radius: var(--radius-pill);
   padding: 0.45rem 1.15rem;
@@ -475,7 +503,7 @@ header[id] {
   width: 40px;
   height: 40px;
   flex: 0 0 40px;
-  background: rgba(200, 209, 220, 0.12);
+  background: rgba(var(--zane-gold-rgb), 0.12);
   border: 1px solid var(--zane-border-gold);
   border-radius: 50%;
   display: flex;
@@ -509,8 +537,75 @@ header[id] {
 .hero-cta-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.25rem;
   align-items: center;
+}
+
+/* CTA primario: fondo sólido de acento + texto oscuro */
+.hero-cta--primary {
+  background: var(--zane-gold);
+  color: #000000 !important;
+  font-family: var(--zane-font);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding: 0.95rem 2.1rem;
+  border: none;
+  box-shadow: 0 10px 30px rgba(var(--zane-gold-rgb), 0.35);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-cta--primary:hover {
+  background: var(--zane-gold-hover);
+  color: #000000 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(var(--zane-gold-rgb), 0.5);
+}
+
+.hero-cta--primary:active {
+  transform: translateY(0) scale(0.96);
+  transition: transform 100ms ease-out;
+}
+
+/* CTA secundario: solo texto, con subrayado al hover */
+.hero-cta--secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.95rem 0.35rem;
+  font-family: var(--zane-font);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--zane-text-main);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.hero-cta--secondary:hover {
+  color: var(--zane-gold);
+  border-bottom-color: var(--zane-gold);
+}
+
+.hero-cta--secondary:active {
+  opacity: 0.6;
+  transition: opacity 100ms ease-out;
+}
+
+.hero-cta--secondary i {
+  transition: transform var(--transition-fast);
+}
+
+.hero-cta--secondary:hover i {
+  transform: translateX(3px);
 }
 
 /* Imagen del Hero (Framing Editorial) */
@@ -523,7 +618,7 @@ header[id] {
 .hero-media-backdrop {
   position: absolute;
   inset: -15px -15px 15px 15px;
-  background: linear-gradient(135deg, rgba(200, 209, 220, 0.25) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(var(--zane-gold-rgb), 0.25) 0%, transparent 60%);
   border-radius: var(--radius-lg);
   z-index: 0;
   filter: blur(12px);
@@ -624,7 +719,7 @@ header[id] {
   grid-template-columns: 60px minmax(0, 1fr) auto 50px;
   align-items: center;
   gap: 1.5rem;
-  padding: 1.6rem 1.25rem;
+  padding: 1.75rem;
   border-bottom: 1px solid var(--zane-border);
   border-radius: var(--radius-sm);
   transition: all var(--transition-normal);
@@ -638,7 +733,7 @@ header[id] {
 }
 
 .service-row--featured {
-  background: linear-gradient(90deg, rgba(200, 209, 220, 0.06) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(var(--zane-gold-rgb), 0.06) 0%, transparent 100%);
   border-left: 2px solid var(--zane-gold);
 }
 
@@ -675,8 +770,9 @@ header[id] {
 
 .service-copy p {
   margin: 0;
-  font-size: 0.92rem;
-  color: var(--zane-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #e2e8f0;
 }
 
 .service-sublist {
@@ -688,8 +784,8 @@ header[id] {
 }
 
 .service-sublist li {
-  font-size: 0.88rem;
-  color: var(--zane-text-muted);
+  font-size: 0.9rem;
+  color: #e2e8f0;
   padding-left: 1.1rem;
   position: relative;
 }
@@ -712,10 +808,12 @@ header[id] {
 
 .service-price {
   font-family: var(--zane-display);
-  font-size: 1.85rem;
+  font-size: clamp(1.25rem, 1rem + 1.4vw, 1.85rem);
   font-weight: 700;
   color: var(--zane-gold-light);
-  white-space: nowrap;
+  line-height: 1.15;
+  text-align: right;
+  white-space: normal;
 }
 
 .service-price small {
@@ -730,7 +828,7 @@ header[id] {
   height: 44px;
   border-radius: 50%;
   border: 1px solid var(--zane-border-gold);
-  background: rgba(200, 209, 220, 0.06);
+  background: rgba(var(--zane-gold-rgb), 0.06);
   color: var(--zane-gold);
   display: flex;
   align-items: center;
@@ -738,11 +836,17 @@ header[id] {
   transition: all var(--transition-fast);
 }
 
+.service-cta:active,
+.service-row:hover .service-cta:active {
+  transform: scale(0.9);
+  transition: transform 100ms ease-out;
+}
+
 .service-row:hover .service-cta {
   background: var(--zane-gold);
   color: #000000;
   transform: scale(1.08);
-  box-shadow: 0 4px 15px rgba(200, 209, 220, 0.4);
+  box-shadow: 0 4px 15px rgba(var(--zane-gold-rgb), 0.4);
 }
 
 .price-note {
@@ -808,12 +912,15 @@ header[id] {
   border-color: var(--zane-gold);
   color: #000000;
   font-weight: 700;
-  box-shadow: 0 4px 15px rgba(200, 209, 220, 0.3);
+  box-shadow: 0 4px 15px rgba(var(--zane-gold-rgb), 0.3);
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* auto-fit + justify-content: al filtrar, las tarjetas visibles quedan centradas
+     en vez de alinearse a la izquierda con huecos vacíos */
+  grid-template-columns: repeat(auto-fit, minmax(0, 340px));
+  justify-content: center;
   gap: 1.5rem;
 }
 
@@ -824,13 +931,24 @@ header[id] {
   position: relative;
   border: 1px solid var(--zane-border);
   background: var(--zane-bg-card);
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
   cursor: pointer;
   transition: all var(--transition-normal);
 }
 
 .gallery-item.is-hidden {
   display: none !important;
+}
+
+/* Filtro con reflujo animado (FLIP en script.js): lo que sale se desvanece
+   antes de sacarlo del flujo; lo que entra crece desde aquí; lo que se
+   reacomoda usa la misma transición "all" de .gallery-item para deslizar
+   a su nueva casilla en vez de saltar (WWDC18 · spatial consistency). */
+.gallery-item.is-leaving,
+.gallery-item.is-entering {
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
 }
 
 .gallery-item img {
@@ -845,6 +963,11 @@ header[id] {
   transform: translateY(-6px);
   border-color: var(--zane-border-gold);
   box-shadow: var(--shadow-gold);
+}
+
+.gallery-item:active {
+  transform: scale(0.97);
+  transition: transform 100ms ease-out;
 }
 
 .gallery-item:hover img {
@@ -900,6 +1023,14 @@ header[id] {
 .lightbox-content {
   margin: 0;
   text-align: center;
+  transform: scale(0.88);
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Materializa en vez de solo aparecer: crece junto con el desvanecido del
+   fondo, y al cerrar recoge exactamente el mismo camino (misma curva). */
+.lightbox.is-open .lightbox-content {
+  transform: scale(1);
 }
 
 .lightbox-content img {
@@ -908,7 +1039,8 @@ header[id] {
   object-fit: contain;
   border-radius: var(--radius-sm);
   border: 1px solid var(--zane-border-gold);
-  box-shadow: var(--shadow-lg), 0 0 40px rgba(200, 209, 220, 0.2);
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(var(--zane-gold-rgb), 0.2);
+  transition: opacity 150ms ease;
 }
 
 .lightbox-content figcaption {
@@ -973,10 +1105,20 @@ header[id] {
 }
 
 .testimonials-layout {
-  display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
-  gap: 4.5rem;
-  align-items: center;
+  display: block;
+  text-align: center;
+}
+
+.testimonials-layout .section-head {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.testimonials-layout #testimonialsCarousel {
+  width: 80%;
+  max-width: 760px;
+  margin: 3rem auto 0;
 }
 
 .testimonial {
@@ -1007,7 +1149,7 @@ header[id] {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(200, 209, 220, 0.25) 0%, rgba(200, 209, 220, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(var(--zane-gold-rgb), 0.25) 0%, rgba(var(--zane-gold-rgb), 0.05) 100%);
   border: 2px solid var(--zane-gold);
   color: var(--zane-gold-light);
   display: flex;
@@ -1017,7 +1159,7 @@ header[id] {
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  box-shadow: 0 4px 12px rgba(200, 209, 220, 0.2);
+  box-shadow: 0 4px 12px rgba(var(--zane-gold-rgb), 0.2);
 }
 
 .testimonial-meta {
@@ -1060,8 +1202,9 @@ header[id] {
 
 .testimonials-controls {
   display: flex;
+  justify-content: center;
   gap: 0.75rem;
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
 }
 
 .testimonials-section .carousel-control-prev,
@@ -1089,7 +1232,26 @@ header[id] {
 }
 
 .testimonials-section .carousel-indicators {
-  display: none;
+  position: static;
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+}
+
+.testimonials-section .carousel-indicators [data-bs-target] {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--zane-border-gold);
+  background: transparent;
+  opacity: 1;
+  transition: all var(--transition-fast);
+}
+
+.testimonials-section .carousel-indicators .active {
+  background: var(--zane-gold);
+  border-color: var(--zane-gold);
 }
 
 /* --------------------------------------------------------------------------
@@ -1150,6 +1312,24 @@ header[id] {
   align-items: start;
 }
 
+.faq-help-text {
+  margin: 1.25rem 0;
+  color: var(--zane-text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  max-width: 34ch;
+}
+
+.faq-help-btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 991px) {
+  .faq-help-text {
+    margin-top: 0.5rem;
+  }
+}
+
 .faq-section .accordion-item {
   background: var(--zane-bg-card);
   border: 1px solid var(--zane-border);
@@ -1178,11 +1358,15 @@ header[id] {
 
 .faq-section .accordion-button:not(.collapsed) {
   color: var(--zane-gold);
-  background: rgba(200, 209, 220, 0.04);
+  background: rgba(var(--zane-gold-rgb), 0.04);
 }
 
 .faq-section .accordion-button::after {
-  filter: invert(75%) sepia(50%) saturate(1000%) hue-rotate(5deg);
+  filter: brightness(0) invert(0.82);
+}
+
+.faq-section .accordion-button:not(.collapsed)::after {
+  filter: brightness(0) invert(1);
 }
 
 .faq-section .accordion-body {
@@ -1255,38 +1439,48 @@ header[id] {
   letter-spacing: 0.08em;
 }
 
-.power-note {
-  max-width: 440px;
-  background: rgba(22, 25, 34, 0.8);
-  border: 1px solid var(--zane-border-gold);
-  border-radius: var(--radius-pill);
-  padding: 0.65rem 1.5rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.85rem;
+/* Nota de respaldo eléctrico integrada dentro de la tarjeta de horarios */
+.hours-power-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.15rem;
+  background: rgba(var(--zane-gold-rgb), 0.06);
+  border: 1px solid var(--zane-border-gold-subtle);
+  border-radius: var(--radius-sm);
   text-align: left;
 }
 
-.power-note i {
-  font-size: 1.25rem;
-}
-
-.power-note span {
-  display: flex;
-  flex-direction: column;
-}
-
-.power-note strong {
-  font-family: var(--zane-display);
+.hours-power-note i {
   font-size: 1rem;
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.hours-power-note span {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--zane-text-secondary);
+}
+
+.hours-power-note strong {
+  font-family: var(--zane-display);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #fff;
+  font-weight: 700;
+  margin-right: 0.3rem;
 }
 
-.power-note small {
-  font-size: 0.78rem;
-  color: var(--zane-text-muted);
+/* CTA de WhatsApp a ancho completo, alineado con la tarjeta */
+.hours-cta {
+  max-width: 580px;
+  margin: 1.75rem auto 0;
+}
+
+.hours-cta .btn {
+  width: 100%;
 }
 
 /* --------------------------------------------------------------------------
@@ -1308,9 +1502,14 @@ header[id] {
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 3rem;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: stretch;
+}
+
+.contact-card {
+  display: flex;
+  flex-direction: column;
 }
 
 .contact-title {
@@ -1321,7 +1520,7 @@ header[id] {
 .contact-list {
   list-style: none;
   padding: 0;
-  margin: 0 0 2rem;
+  margin: 0 0 1rem;
   display: grid;
   gap: 1.5rem;
 }
@@ -1337,7 +1536,7 @@ header[id] {
   height: 44px;
   flex: 0 0 44px;
   border-radius: 50%;
-  background: rgba(200, 209, 220, 0.1);
+  background: rgba(var(--zane-gold-rgb), 0.1);
   border: 1px solid var(--zane-border-gold);
   color: var(--zane-gold);
   display: flex;
@@ -1369,15 +1568,34 @@ header[id] {
   font-size: 0.92rem;
 }
 
+/* Redes sociales: fila horizontal directamente bajo la lista de contacto */
 .contact-actions {
   display: flex;
-  gap: 0.85rem;
+  align-items: center;
+  gap: 16px;
+  margin-top: 0.5rem;
+}
+
+.contact-map {
+  display: flex;
+  flex-direction: column;
 }
 
 .map-container {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 360px;
   border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--zane-border);
+}
+
+.map-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 .map-scroll-shield {
@@ -1399,8 +1617,10 @@ header[id] {
 }
 
 .booking-modal .modal-header {
-  border-bottom: 1px solid var(--zane-border);
+  border-bottom: 1px solid var(--zane-border-gold-subtle);
   padding: 1.5rem 1.75rem;
+  background: var(--zane-bg-surface);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 .booking-modal .modal-title {
@@ -1457,7 +1677,7 @@ header[id] {
   gap: 0.35rem;
   margin-top: 1.5rem;
   padding: 1.15rem;
-  background: rgba(200, 209, 220, 0.08);
+  background: rgba(var(--zane-gold-rgb), 0.08);
   border-left: 3px solid var(--zane-gold);
   border-radius: var(--radius-xs);
 }
@@ -1630,10 +1850,15 @@ header[id] {
   background: rgba(255, 255, 255, 0.04);
 }
 
+.admin-tab:active {
+  background: rgba(255, 255, 255, 0.09);
+  transition: background 100ms ease-out;
+}
+
 .admin-tab.is-active {
   color: var(--zane-gold);
   border-left-color: var(--zane-gold);
-  background: rgba(200, 209, 220, 0.07);
+  background: rgba(var(--zane-gold-rgb), 0.07);
 }
 
 .tab-count {
@@ -1972,7 +2197,7 @@ header[id] {
 }
 
 .booking-float {
-  background: linear-gradient(135deg, #FFFFFF 0%, #C8D1DC 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #C8C7C9 100%);
 }
 
 .whatsapp-float {
@@ -1984,6 +2209,12 @@ header[id] {
 .whatsapp-float:hover {
   transform: scale(1.1);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.booking-float:active,
+.whatsapp-float:active {
+  transform: scale(0.94);
+  transition: transform 100ms ease-out;
 }
 
 .float-tooltip {
@@ -2029,19 +2260,27 @@ header[id] {
     padding: 5.5rem 0 3.5rem;
   }
 
-  .testimonials-layout,
   .faq-layout {
     grid-template-columns: 1fr;
     gap: 2.5rem;
   }
 
+  .testimonials-layout #testimonialsCarousel {
+    width: 100%;
+    max-width: 560px;
+  }
+
   .contact-grid {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: 2rem;
+  }
+
+  .map-container {
+    min-height: 300px;
   }
 
   .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(0, 320px));
   }
 
   .stats-grid {
@@ -2062,6 +2301,7 @@ header[id] {
   .service-row {
     grid-template-columns: 48px minmax(0, 1fr) auto;
     gap: 1rem;
+    padding: 1.5rem;
   }
 
   .service-row .service-cta {
@@ -2069,7 +2309,7 @@ header[id] {
   }
 
   .gallery-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 360px);
   }
 
   .stats-grid {
@@ -2102,4 +2342,558 @@ header[id] {
   .map-scroll-shield {
     display: block;
   }
+}
+
+/* --------------------------------------------------------------------------
+   UI KIT — Diálogos ZANE (reemplazan alert / confirm / prompt del navegador)
+   -------------------------------------------------------------------------- */
+.zdialog-overlay[hidden],
+.zdialog-field[hidden] {
+  display: none;
+}
+
+.zdialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(7, 8, 11, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: zdialog-fade 0.18s ease;
+}
+
+body.zdialog-open {
+  overflow: hidden;
+}
+
+.zdialog {
+  width: 100%;
+  max-width: 420px;
+  padding: 1.75rem;
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border-gold);
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: zdialog-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zdialog-brand {
+  margin: 0 0 0.85rem;
+  font-family: var(--zane-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--zane-text-muted);
+}
+
+.zdialog-brand span {
+  color: var(--zane-gold);
+}
+
+.zdialog-title {
+  margin: 0 0 0.5rem;
+  font-family: var(--zane-display);
+  font-size: 1.4rem;
+  line-height: 1.15;
+  color: var(--zane-text-main);
+}
+
+.zdialog-message {
+  margin: 0;
+  color: var(--zane-text-secondary);
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+.zdialog-detail {
+  margin: 0.5rem 0 0;
+  color: var(--zane-text-muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.zdialog-field {
+  display: block;
+  margin-top: 1.1rem;
+}
+
+.zdialog-field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--zane-text-muted);
+}
+
+.zdialog-input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--zane-border-gold);
+  border-radius: 9px;
+  background: var(--zane-bg-main);
+  color: var(--zane-text-main);
+  font-family: var(--zane-font);
+  font-size: 0.95rem;
+}
+
+.zdialog-input:focus {
+  outline: none;
+  border-color: var(--zane-gold);
+  box-shadow: 0 0 0 3px var(--zane-gold-glow);
+}
+
+.zdialog-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.zdialog--alert .zdialog-actions {
+  margin-top: 1.25rem;
+}
+
+.zdialog-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.55rem 1.15rem;
+  border: 1px solid var(--zane-border-gold);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--zane-text-secondary);
+  font-family: var(--zane-font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.zdialog-btn:hover {
+  background: var(--zane-bg-elevated);
+  color: var(--zane-text-main);
+}
+
+.zdialog-btn:focus-visible {
+  outline: 2px solid var(--zane-gold);
+  outline-offset: 2px;
+}
+
+.zdialog-confirm {
+  border-color: var(--zane-gold);
+  background: var(--zane-gold);
+  color: #0f1115;
+}
+
+.zdialog-confirm:hover {
+  border-color: var(--zane-gold-hover);
+  background: var(--zane-gold-hover);
+  color: #0f1115;
+}
+
+.zdialog-confirm.is-danger {
+  border-color: var(--accent-urgent);
+  background: var(--accent-urgent);
+  color: #fff;
+}
+
+.zdialog-confirm.is-danger:hover {
+  border-color: #e08a6c;
+  background: #e08a6c;
+}
+
+@keyframes zdialog-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zdialog-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+  .zdialog-actions {
+    flex-direction: column-reverse;
+  }
+
+  .zdialog-btn {
+    width: 100%;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   UI KIT — Desplegable ZANE (reemplaza el <select> nativo)
+   -------------------------------------------------------------------------- */
+.zsel {
+  position: relative;
+  width: 100%;
+}
+
+.zsel-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+}
+
+.zsel-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--zane-bg-surface);
+  color: #fff;
+  font-family: var(--zane-font);
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast, 0.15s ease),
+    box-shadow var(--transition-fast, 0.15s ease);
+}
+
+.zsel-trigger:hover {
+  border-color: var(--zane-border-gold);
+}
+
+.zsel-trigger:focus-visible,
+.zsel.is-open .zsel-trigger {
+  outline: none;
+  border-color: var(--zane-gold);
+  box-shadow: 0 0 0 3px var(--zane-gold-glow);
+}
+
+.zsel-trigger.is-placeholder .zsel-label {
+  color: var(--zane-text-dim);
+}
+
+.zsel-label {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.zsel-caret {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--zane-gold);
+  border-bottom: 2px solid var(--zane-gold);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.18s ease;
+}
+
+.zsel.is-open .zsel-caret {
+  transform: translateY(1px) rotate(225deg);
+}
+
+.zsel-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  max-height: 264px;
+  overflow-y: auto;
+  padding: 0.35rem;
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--zane-bg-elevated);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  animation: zdialog-pop 0.15s ease;
+}
+
+.zsel-option {
+  padding: 0.6rem 0.75rem;
+  border-radius: 7px;
+  color: var(--zane-text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.zsel-option.is-empty-option {
+  color: var(--zane-text-dim);
+}
+
+.zsel-option.is-active {
+  background: var(--zane-gold-glow);
+  color: var(--zane-text-main);
+}
+
+.zsel-option.is-selected {
+  color: var(--zane-gold);
+  font-weight: 600;
+}
+
+.zsel-option.is-selected.is-active {
+  background: var(--zane-gold-glow-strong);
+}
+
+.zsel-option[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+}
+/* --------------------------------------------------------------------------
+   19. ACCESIBILIDAD: foco visible + movimiento reducido
+   -------------------------------------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible,
+.gallery-item:focus-visible {
+  outline: 2px solid var(--zane-gold);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   UI KIT — Calendario ZANE (reemplaza <input type="date">)
+   -------------------------------------------------------------------------- */
+.zdate {
+  position: relative;
+  width: 100%;
+}
+
+.zdate-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  border: 0;
+}
+
+.zdate-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--zane-border);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--zane-bg-surface);
+  color: #fff;
+  font-family: var(--zane-font);
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-fast, 0.15s ease),
+    box-shadow var(--transition-fast, 0.15s ease);
+}
+
+.zdate-trigger:hover {
+  border-color: var(--zane-border-gold);
+}
+
+.zdate-trigger:focus-visible,
+.zdate.is-open .zdate-trigger {
+  outline: none;
+  border-color: var(--zane-gold);
+  box-shadow: 0 0 0 3px var(--zane-gold-glow);
+}
+
+.zdate-trigger.is-placeholder .zdate-label {
+  color: var(--zane-text-dim);
+}
+
+.zdate-label {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.zdate-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  color: var(--zane-gold);
+  opacity: 0.85;
+}
+
+.zdate-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  padding: 0.75rem;
+  border: 1px solid var(--zane-border-gold);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--zane-bg-elevated);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  animation: zdialog-pop 0.15s ease;
+}
+
+.zdate-head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.zdate-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--zane-display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+  color: var(--zane-text-main);
+}
+
+.zdate-nav {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--zane-text-secondary);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.zdate-nav:hover {
+  background: var(--zane-gold-glow);
+  color: var(--zane-text-main);
+}
+
+.zdate-week,
+.zdate-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.zdate-week {
+  margin-bottom: 4px;
+}
+
+.zdate-week span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--zane-text-dim);
+  padding: 0.25rem 0;
+}
+
+.zdate-day {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--zane-text-secondary);
+  font-family: var(--zane-font);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.zdate-day:hover:not(:disabled) {
+  background: var(--zane-gold-glow);
+  color: var(--zane-text-main);
+}
+
+.zdate-day.is-outside {
+  color: var(--zane-text-dim);
+  opacity: 0.55;
+}
+
+.zdate-day.is-today {
+  border-color: var(--zane-border-gold);
+  color: var(--zane-gold);
+  font-weight: 600;
+}
+
+.zdate-day.is-focus {
+  box-shadow: 0 0 0 2px var(--zane-gold-glow-strong) inset;
+}
+
+.zdate-day.is-selected {
+  background: var(--zane-gold);
+  border-color: var(--zane-gold);
+  color: #0f1115;
+  font-weight: 700;
+}
+
+.zdate-day:disabled,
+.zdate-day.is-disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.zdate-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--zane-border);
+}
+
+.zdate-link {
+  border: none;
+  background: transparent;
+  color: var(--zane-gold);
+  font-family: var(--zane-font);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.zdate-link:hover {
+  background: var(--zane-gold-glow);
+  color: var(--zane-gold-hover);
+}
+
+.zdate-panel[hidden] {
+  display: none;
+}
+
+@media (max-width: 400px) {
+  .zdate-panel { width: 264px; }
 }

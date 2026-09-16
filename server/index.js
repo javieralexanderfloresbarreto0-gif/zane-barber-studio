@@ -1,11 +1,27 @@
+// Zona horaria fija del proceso: la agrupación "hoy" de la cola de turnos y los
+// cierres de caja usan date('now','localtime') en SQLite, que sigue a esta TZ.
+process.env.TZ = process.env.TZ || 'America/Caracas';
+
 const express = require('express');
+const compression = require('compression');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const Database = require('better-sqlite3');
 
 const app = express();
+// Detrás de un proxy inverso (nginx, Cloudflare…) define TRUST_PROXY (un número
+// de saltos, "loopback", o una lista de IPs) para que req.ip / req.protocol sean
+// los reales. Sin proxy, déjalo sin definir.
+if (process.env.TRUST_PROXY) {
+  const tp = process.env.TRUST_PROXY;
+  app.set('trust proxy', /^\d+$/.test(tp) ? Number(tp) : tp);
+}
 const port = Number(process.env.PORT) || 3000;
+// Dominio público del sitio. En producción defínelo (BASE_URL=https://tu-dominio.com)
+// para que las etiquetas Open Graph / canónica / JSON-LD lleven URLs absolutas
+// correctas. Si no está, se deriva del host de cada petición.
+const configuredBaseUrl = (process.env.BASE_URL || '').replace(/\/+$/, '');
 const rootDirectory = path.join(__dirname, '..');
 const publicDirectory = path.join(rootDirectory, 'public');
 const dataDirectory = path.join(rootDirectory, 'data');
@@ -36,6 +52,31 @@ const loginAttempts = new Map();
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 15 * 60 * 1000;
 
+// Precios de la web en bolívares: tasa USDT del día + margen fijo + redondeo
+// hacia arriba. Reglas de negocio fijas. La tasa se obtiene automáticamente de
+// APIs públicas (con respaldo) y se cachea; el panel permite forzar una manual.
+// Todo se expone en /api/rate para que el cliente calcule igual que el servidor.
+const RATE_MARGIN = 0.05;
+const RATE_ROUND_TO = 250;
+const RATE_TTL_MS = 30 * 60 * 1000;
+const RATE_SOURCES = [
+  {
+    name: 'criptoya/binance-p2p',
+    url: 'https://criptoya.com/api/usdt/ves/1',
+    pick: (data) => {
+      const asks = ['binancep2p', 'okexp2p', 'bybitp2p', 'bitgetp2p', 'bingxp2p']
+        .map((key) => data && data[key] && Number(data[key].totalAsk))
+        .filter((value) => Number.isFinite(value) && value > 0);
+      return asks.length ? asks.reduce((sum, value) => sum + value, 0) / asks.length : null;
+    }
+  },
+  {
+    name: 'dolarapi/paralelo',
+    url: 'https://ve.dolarapi.com/v1/dolares/paralelo',
+    pick: (data) => (data && Number(data.promedio)) || null
+  }
+];
+
 function loadTokenSecret() {
   if (process.env.TOKEN_SECRET) return process.env.TOKEN_SECRET;
   if (fs.existsSync(tokenSecretPath)) return fs.readFileSync(tokenSecretPath, 'utf8').trim();
@@ -47,19 +88,38 @@ function loadTokenSecret() {
 const TOKEN_SECRET = loadTokenSecret();
 const database = new Database(databasePath);
 database.pragma('foreign_keys = ON');
+database.pragma('journal_mode = WAL');
+database.pragma('busy_timeout = 5000');
 database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'schema.sql'), 'utf8'));
 database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'seed.sql'), 'utf8'));
+database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'kiosc.sql'), 'utf8'));
 
+app.use(compression());
 app.use(express.json({ limit: '1mb' }));
 app.use((request, response, next) => {
   response.setHeader('X-Content-Type-Options', 'nosniff');
   response.setHeader('X-Frame-Options', 'DENY');
-  response.setHeader('X-XSS-Protection', '1; mode=block');
+  // X-XSS-Protection ya es contraproducente en navegadores modernos: se desactiva.
+  response.setHeader('X-XSS-Protection', '0');
   response.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   next();
 });
-// Todos los archivos estáticos del sitio viven en public/ (index.html, css, js, img, vendor)
-app.use(express.static(publicDirectory));
+// Estáticos de public/ (css, js, img, vendor). index:false para que index.html
+// pase por el render que inyecta BASE_URL. Las librerías vendorizadas llevan
+// filename estable => se pueden cachear con fuerza; imágenes, una semana.
+app.use(express.static(publicDirectory, {
+  index: false,
+  setHeaders: (response, filePath) => {
+    const relative = path.relative(publicDirectory, filePath);
+    if (relative.startsWith('vendor' + path.sep)) {
+      response.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    } else if (relative.startsWith('img' + path.sep)) {
+      response.setHeader('Cache-Control', 'public, max-age=604800');
+    } else {
+      response.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    }
+  }
+}));
 
 app.use((request, response, next) => {
   const blocked = ['/data', '/db', '/node_modules'];
@@ -69,12 +129,41 @@ app.use((request, response, next) => {
   next();
 });
 
+// index.html se sirve renderizado: se sustituye {{BASE_URL}} por el dominio real
+// (env BASE_URL, o protocolo+host de la petición) para las etiquetas SEO/OG/JSON-LD.
+const indexTemplate = fs.readFileSync(path.join(publicDirectory, 'index.html'), 'utf8');
+
+function renderIndex(request) {
+  const base = configuredBaseUrl || `${request.protocol}://${request.get('host')}`;
+  return indexTemplate.split('{{BASE_URL}}').join(base);
+}
+
 app.get(['/', '/index.html'], (request, response) => {
-  response.sendFile(path.join(publicDirectory, 'index.html'));
+  response.type('html').send(renderIndex(request));
 });
 
 app.get(['/admin', '/admin/', '/admin/index.html'], (request, response) => {
-  response.sendFile(path.join(publicDirectory, 'index.html'));
+  response.set('X-Robots-Tag', 'noindex, nofollow');
+  response.type('html').send(renderIndex(request));
+});
+
+function siteBase(request) {
+  return configuredBaseUrl || `${request.protocol}://${request.get('host')}`;
+}
+
+app.get('/robots.txt', (request, response) => {
+  response.type('text/plain').send(
+    `User-agent: *\nDisallow: /admin\nDisallow: /kiosc\n\nSitemap: ${siteBase(request)}/sitemap.xml\n`
+  );
+});
+
+app.get('/sitemap.xml', (request, response) => {
+  response.type('application/xml').send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `  <url><loc>${siteBase(request)}/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>\n` +
+    `</urlset>\n`
+  );
 });
 
 function requireFields(body, fields) {
@@ -115,9 +204,9 @@ function safeEqual(left, right) {
   return crypto.timingSafeEqual(leftBuffer, rightBuffer);
 }
 
-function signToken(payload) {
+function signToken(payload, ttlMs) {
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-  const body = Buffer.from(JSON.stringify({ ...payload, exp: Date.now() + 12 * 60 * 60 * 1000 })).toString('base64url');
+  const body = Buffer.from(JSON.stringify({ ...payload, exp: Date.now() + (ttlMs || 12 * 60 * 60 * 1000) })).toString('base64url');
   const signature = crypto.createHmac('sha256', TOKEN_SECRET).update(header + '.' + body).digest('base64url');
   return header + '.' + body + '.' + signature;
 }
@@ -132,19 +221,94 @@ function verifyToken(token) {
     return null;
   }
   const expected = crypto.createHmac('sha256', TOKEN_SECRET).update(parts[0] + '.' + parts[1]).digest('base64url');
-  if (!safeEqual(expected, parts[2]) || payload.exp < Date.now()) return null;
+  if (!safeEqual(expected, parts[2])) return null;
+  if (typeof payload.exp !== 'number' || payload.exp < Date.now()) return null;
   return payload;
 }
 
 function requireAuth(request, response, next) {
   const header = request.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-  if (!token || !verifyToken(token)) return response.status(401).json({ error: 'No autorizado. Inicia sesión nuevamente.' });
+  const payload = token ? verifyToken(token) : null;
+  // Los tokens con "scope" son de propósito único (p. ej. el stream SSE) y no
+  // valen como sesión de admin general.
+  if (!payload || payload.scope) {
+    return response.status(401).json({ error: 'No autorizado. Inicia sesión nuevamente.' });
+  }
   next();
 }
 
 function getClient(clientId) {
   return database.prepare('SELECT * FROM clients WHERE id = ?').get(clientId);
+}
+
+function getSetting(key) {
+  const row = database.prepare('SELECT value FROM app_settings WHERE key = ?').get(key);
+  return row ? row.value : null;
+}
+
+function setSetting(key, value) {
+  database.prepare(`INSERT INTO app_settings (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)
+    ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP`).run(key, String(value));
+}
+
+let autoRateFetchedAt = 0;
+let autoRateInFlight = null;
+
+async function fetchAutoRate() {
+  for (const source of RATE_SOURCES) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const response = await fetch(source.url, { signal: controller.signal, headers: { 'User-Agent': 'ZaneBarber/1.0' } });
+      clearTimeout(timer);
+      if (!response.ok) continue;
+      const value = source.pick(await response.json());
+      if (Number.isFinite(value) && value > 0) {
+        setSetting('usdt_rate_auto', value);
+        setSetting('usdt_rate_auto_at', new Date().toISOString());
+        setSetting('usdt_rate_source', source.name);
+        autoRateFetchedAt = Date.now();
+        console.log(`[ZANE] Tasa USDT: ${value.toFixed(2)} Bs (${source.name})`);
+        return value;
+      }
+    } catch (error) {
+      // fuente caída: probamos la siguiente
+    }
+  }
+  console.warn('[ZANE] Ninguna fuente de tasa respondió; se mantiene la última conocida.');
+  return null;
+}
+
+function ensureAutoRate() {
+  if ((Number(getSetting('usdt_rate')) || 0) > 0) return Promise.resolve();
+  const cached = Number(getSetting('usdt_rate_auto')) || 0;
+  if (cached > 0 && Date.now() - autoRateFetchedAt < RATE_TTL_MS) return Promise.resolve();
+  if (!autoRateInFlight) autoRateInFlight = fetchAutoRate().finally(() => { autoRateInFlight = null; });
+  return autoRateInFlight;
+}
+
+function currentRate() {
+  const manual = Number(getSetting('usdt_rate')) || 0;
+  const auto = Number(getSetting('usdt_rate_auto')) || 0;
+  const usingManual = manual > 0;
+  const rate = usingManual ? manual : auto;
+  return {
+    rate: Number.isFinite(rate) && rate > 0 ? rate : 0,
+    margin: RATE_MARGIN,
+    round_to: RATE_ROUND_TO,
+    source: usingManual ? 'manual' : (auto > 0 ? (getSetting('usdt_rate_source') || 'auto') : 'none'),
+    updated_at: usingManual
+      ? (database.prepare("SELECT updated_at FROM app_settings WHERE key = 'usdt_rate'").get() || {}).updated_at
+      : getSetting('usdt_rate_auto_at')
+  };
+}
+
+function bolivaresFromUsd(usd, rate) {
+  const amount = Number(usd);
+  const dayRate = Number(rate);
+  if (!Number.isFinite(amount) || amount < 0 || !Number.isFinite(dayRate) || dayRate <= 0) return null;
+  return Math.ceil((amount * dayRate * (1 + RATE_MARGIN)) / RATE_ROUND_TO) * RATE_ROUND_TO;
 }
 
 app.post('/api/login', (request, response) => {
@@ -159,9 +323,9 @@ app.post('/api/login', (request, response) => {
   if (!password || !safeEqual(password, ADMIN_PASSWORD)) {
     const attempts = (record ? record.count : 0) + 1;
     if (attempts >= MAX_ATTEMPTS) {
-      loginAttempts.set(ip, { count: 0, lockedUntil: now + LOCKOUT_MS });
+      loginAttempts.set(ip, { count: 0, lockedUntil: now + LOCKOUT_MS, seenAt: now });
     } else {
-      loginAttempts.set(ip, { count: attempts, lockedUntil: 0 });
+      loginAttempts.set(ip, { count: attempts, lockedUntil: 0, seenAt: now });
     }
     return response.status(401).json({ error: 'Contraseña incorrecta.' });
   }
@@ -171,6 +335,35 @@ app.post('/api/login', (request, response) => {
 
 app.get('/api/health', (request, response) => {
   response.json({ ok: true, database: 'sqlite' });
+});
+
+// Público: la landing lo usa para mostrar los precios en bolívares.
+// Con ?usd=<monto> devuelve además la conversión ya calculada.
+app.get('/api/rate', async (request, response) => {
+  await ensureAutoRate();
+  const info = currentRate();
+  if (request.query.usd !== undefined) {
+    info.usd = Number(request.query.usd);
+    info.bolivares = bolivaresFromUsd(request.query.usd, info.rate);
+  }
+  response.json(info);
+});
+
+// Fuerza una tasa manual fija. rate = 0 vuelve al modo automático.
+app.put('/api/rate', requireAuth, (request, response) => {
+  const rate = Number(request.body && request.body.rate);
+  if (!Number.isFinite(rate) || rate < 0) {
+    return response.status(400).json({ error: 'La tasa no es válida.' });
+  }
+  setSetting('usdt_rate', rate);
+  if (rate === 0) { autoRateFetchedAt = 0; ensureAutoRate(); }
+  response.json(currentRate());
+});
+
+// Vuelve a consultar las APIs de tasa ahora mismo.
+app.post('/api/rate/refresh', requireAuth, async (request, response) => {
+  await fetchAutoRate();
+  response.json(currentRate());
 });
 
 app.get('/api/reminders/pending', requireAuth, (request, response) => {
@@ -352,6 +545,13 @@ app.get('/api/dashboard', requireAuth, (request, response) => {
   response.json(totals);
 });
 
+// Kiosco de turnos: catálogo, órdenes, Pago Móvil, cola y SSE en vivo.
+require('./kiosc/mount')({
+  app, database, publicDirectory, dataDirectory,
+  verifyToken, requireAuth, signToken, normalizePhone,
+  currentRate, bolivaresFromUsd, getSetting, setSetting
+});
+
 app.use((request, response) => {
   if (request.path.startsWith('/api/')) {
     return response.status(404).json({ error: 'Ruta no encontrada.' });
@@ -364,4 +564,27 @@ app.use((error, request, response, next) => {
   response.status(500).json({ error: 'Error interno del servidor.' });
 });
 
-app.listen(port, () => console.log(`Zane Barber Studio: http://localhost:${port}`));
+fetchAutoRate();
+setInterval(fetchAutoRate, RATE_TTL_MS).unref();
+
+// Purga de intentos de login viejos para que el Map no crezca sin límite.
+setInterval(() => {
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  for (const [ip, rec] of loginAttempts) {
+    if ((rec.lockedUntil || 0) < Date.now() && (rec.seenAt || 0) < cutoff) {
+      loginAttempts.delete(ip);
+    }
+  }
+}, 60 * 60 * 1000).unref();
+
+const server = app.listen(port, () => console.log(`Zane Barber Studio: http://localhost:${port}`));
+
+function shutdown(signal) {
+  console.log(`\n[ZANE] ${signal} recibido, cerrando…`);
+  server.close(() => {
+    try { database.close(); } catch (error) { /* ya cerrada */ }
+    process.exit(0);
+  });
+  setTimeout(() => process.exit(1), 5000).unref();
+}
+['SIGINT', 'SIGTERM'].forEach((signal) => process.on(signal, () => shutdown(signal)));

@@ -1,6 +1,31 @@
 (function () {
   var navbar = document.getElementById('mainNav');
 
+  // Precios en bolívares. Se rellenan desde GET /api/rate (valor interno con
+  // respaldo, o manual desde el panel). El cálculo replica exactamente al
+  // servidor. Si no hay valor disponible, se usa el precio en Bs de referencia
+  // que ya viene en el HTML (data-bs).
+  var RATE_STATE = { rate: 0, margin: 0.05, round_to: 250, source: 'none', updated_at: null };
+
+  function bolivaresFromRef(ref) {
+    var amount = Number(ref);
+    if (!isFinite(amount) || amount < 0 || !RATE_STATE.rate || RATE_STATE.rate <= 0) return null;
+    var raw = amount * RATE_STATE.rate * (1 + RATE_STATE.margin);
+    return Math.ceil(raw / RATE_STATE.round_to) * RATE_STATE.round_to;
+  }
+
+  function formatBs(value) {
+    return 'Bs. ' + Math.round(value).toLocaleString('es-VE');
+  }
+
+  function formatRateDate(value) {
+    if (!value) return '';
+    var date = new Date(String(value).replace(' ', 'T'));
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('es-VE', { day: 'numeric', month: 'short' }) + ', ' +
+      date.toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
+  }
+
   function onScroll() {
     if (!navbar) return;
     var atHero = window.scrollY <= 100 && (!window.location.hash || window.location.hash === '#inicio');
@@ -59,7 +84,10 @@
     var readableDate = new Date(bookingDate.value + 'T12:00:00').toLocaleDateString('es-VE', {
       day: 'numeric', month: 'long', year: 'numeric'
     });
-    bookingSummary.textContent = serviceOption.value + ' · $' + serviceOption.dataset.price + ' · ' + readableDate + ' · ' + bookingTime.value;
+    var bs = bolivaresFromRef(serviceOption.dataset.ref);
+    var fallbackBs = Number(serviceOption.dataset.bs) || 0;
+    var priceText = bs !== null ? formatBs(bs) : (fallbackBs ? formatBs(fallbackBs) : 'Consultar');
+    bookingSummary.textContent = serviceOption.value + ' · ' + priceText + ' · ' + readableDate + ' · ' + bookingTime.value;
   }
 
   if (bookingForm && bookingModal) {
@@ -96,7 +124,10 @@
         return;
       }
       var serviceOption = bookingService.options[bookingService.selectedIndex];
-      var message = 'Hola, quiero reservar en Zane Barber Studio.%0A%0AServicio: ' + encodeURIComponent(serviceOption.value) + '%0APrecio: $' + serviceOption.dataset.price + '%0AFecha: ' + encodeURIComponent(bookingDate.value) + '%0AHora: ' + encodeURIComponent(bookingTime.value);
+      var bsAmount = bolivaresFromRef(serviceOption.dataset.ref);
+      var fallbackBs = Number(serviceOption.dataset.bs) || 0;
+      var priceStr = bsAmount !== null ? formatBs(bsAmount) : (fallbackBs ? formatBs(fallbackBs) : 'Consultar');
+      var message = 'Hola, quiero reservar en Zane Barber Studio.%0A%0AServicio: ' + encodeURIComponent(serviceOption.value) + '%0APrecio: ' + encodeURIComponent(priceStr) + '%0AFecha: ' + encodeURIComponent(bookingDate.value) + '%0AHora: ' + encodeURIComponent(bookingTime.value);
       window.open('https://wa.me/584121453691?text=' + message, '_blank', 'noopener');
       bookingModal.hide();
     });
@@ -111,13 +142,27 @@
   var lightboxTitle = document.getElementById('lightboxTitle');
   var lightboxCounter = document.getElementById('lightboxCounter');
 
-  function showLightboxItem() {
+  function prefersReducedMotion() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function showLightboxItem(crossfade) {
     var item = lightboxItems[lightboxIndex];
     if (!item || !lightboxImage) return;
-    lightboxImage.src = item.querySelector('img').src;
-    lightboxImage.alt = item.querySelector('img').alt;
-    if (lightboxTitle) lightboxTitle.textContent = item.querySelector('figcaption').textContent;
-    if (lightboxCounter) lightboxCounter.textContent = (lightboxIndex + 1) + ' / ' + lightboxItems.length;
+    var apply = function () {
+      lightboxImage.src = item.querySelector('img').src;
+      lightboxImage.alt = item.querySelector('img').alt;
+      if (lightboxTitle) lightboxTitle.textContent = item.querySelector('figcaption').textContent;
+      if (lightboxCounter) lightboxCounter.textContent = (lightboxIndex + 1) + ' / ' + lightboxItems.length;
+      requestAnimationFrame(function () { lightboxImage.style.opacity = '1'; });
+    };
+    // Entre fotos, un cruce corto en vez de un cambio seco (mismo lugar, otra imagen)
+    if (crossfade && !prefersReducedMotion()) {
+      lightboxImage.style.opacity = '0';
+      setTimeout(apply, 150);
+    } else {
+      apply();
+    }
   }
 
   function closeLightbox() {
@@ -140,14 +185,96 @@
     if (closeButton) closeButton.focus();
   }
 
+  // Filtrar no debe ser un corte seco: lo que sale se desvanece antes de irse,
+  // lo que entra crece desde cero, y lo que solo cambia de casilla desliza a su
+  // nuevo lugar (técnica FLIP) en vez de saltar de golpe (WWDC18 · spatial
+  // consistency + frame-level smoothness).
+  function applyGalleryFilter(filter) {
+    var show = [], hide = [];
+    galleryItems.forEach(function (item) {
+      var categories = (item.dataset.category || '').split(' ');
+      var matches = filter === 'all' || categories.indexOf(filter) > -1;
+      (matches ? show : hide).push(item);
+    });
+
+    // si se hace clic en otro filtro a medio camino, recupera aquí mismo
+    // cualquier tarjeta que estuviera saliendo y ahora debe quedar visible
+    show.forEach(function (item) {
+      if (item.classList.contains('is-leaving')) {
+        item.classList.remove('is-leaving');
+        item.style.transition = '';
+        item.style.transform = '';
+      }
+    });
+
+    if (prefersReducedMotion()) {
+      hide.forEach(function (item) { item.classList.add('is-hidden'); });
+      show.forEach(function (item) { item.classList.remove('is-hidden'); });
+      return;
+    }
+
+    // FIRST: dónde estaba cada tarjeta que va a seguir visible, antes de tocar nada
+    var firstRects = show.map(function (item) {
+      return item.classList.contains('is-hidden') ? null : item.getBoundingClientRect();
+    });
+
+    function reflowAndPlay() {
+      show.forEach(function (item) { item.classList.remove('is-hidden'); });
+
+      // LAST + INVERT: si ya estaba visible, arranca desde su posición vieja;
+      // si es nueva, arranca encogida (se resuelve con .is-entering)
+      show.forEach(function (item, i) {
+        var first = firstRects[i];
+        if (!first) { item.classList.add('is-entering'); return; }
+        var last = item.getBoundingClientRect();
+        var dx = first.left - last.left, dy = first.top - last.top;
+        if (!dx && !dy) return;
+        item.style.transition = 'none';
+        item.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      });
+      show.forEach(function (item) { item.offsetHeight; }); // fuerza el reflow antes de soltar
+
+      // PLAY: en el siguiente frame se sueltan las posiciones -> todo desliza/crece a la vez
+      requestAnimationFrame(function () {
+        show.forEach(function (item) {
+          item.classList.remove('is-entering');
+          item.style.transition = '';
+          item.style.transform = '';
+        });
+      });
+    }
+
+    if (!hide.length) { reflowAndPlay(); return; }
+
+    var pending = hide.length;
+    hide.forEach(function (item) {
+      if (item.classList.contains('is-hidden')) { pending--; return; }
+      item.classList.add('is-leaving');
+      var done = false;
+      function finish() {
+        if (done) return;
+        done = true;
+        item.removeEventListener('transitionend', onEnd);
+        // si otro filtro ya lo recuperó mientras salía, no lo ocultes por detrás
+        if (item.classList.contains('is-leaving')) {
+          item.classList.remove('is-leaving');
+          item.classList.add('is-hidden');
+        }
+        if (--pending === 0) reflowAndPlay();
+      }
+      function onEnd(event) { if (event.target === item) finish(); }
+      item.addEventListener('transitionend', onEnd);
+      // Por encima de --transition-normal (350ms): si fuera menor, esta red de
+      // seguridad ganaría la carrera y cortaría el desvanecido a mitad de camino.
+      setTimeout(finish, 420);
+    });
+    if (pending === 0) reflowAndPlay();
+  }
+
   galleryFilters.forEach(function (filterButton) {
     filterButton.addEventListener('click', function () {
-      var filter = filterButton.dataset.filter;
       galleryFilters.forEach(function (button) { button.classList.toggle('is-active', button === filterButton); });
-      galleryItems.forEach(function (item) {
-        var categories = (item.dataset.category || '').split(' ');
-        item.classList.toggle('is-hidden', filter !== 'all' && categories.indexOf(filter) === -1);
-      });
+      applyGalleryFilter(filterButton.dataset.filter);
     });
   });
 
@@ -166,12 +293,12 @@
     if (lbPrev) lbPrev.addEventListener('click', function () {
       if (!lightboxItems.length) return;
       lightboxIndex = (lightboxIndex - 1 + lightboxItems.length) % lightboxItems.length;
-      showLightboxItem();
+      showLightboxItem(true);
     });
     if (lbNext) lbNext.addEventListener('click', function () {
       if (!lightboxItems.length) return;
       lightboxIndex = (lightboxIndex + 1) % lightboxItems.length;
-      showLightboxItem();
+      showLightboxItem(true);
     });
     lightbox.addEventListener('click', function (event) { if (event.target === lightbox) closeLightbox(); });
     document.addEventListener('keydown', function (event) {
@@ -282,6 +409,147 @@
   function escapeHTML(value) {
     return String(value).replace(/[&<>'"]/g, function (character) {
       return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character];
+    });
+  }
+
+  var rateInput = document.getElementById('rateInput');
+  var ratePreview = document.getElementById('ratePreview');
+  var rateSave = document.getElementById('rateSave');
+  var rateRefresh = document.getElementById('rateRefresh');
+  var rateFeedback = document.getElementById('rateFeedback');
+  var rateSavedAt = document.getElementById('rateSavedAt');
+  var rateAutoInfo = document.getElementById('rateAutoInfo');
+  var rateNote = document.getElementById('ratePriceNote');
+  var rateValueEl = document.getElementById('rateValue');
+  var rateUpdatedEl = document.getElementById('rateUpdated');
+
+  // Devuelve el precio en bolívares. Si no hay valor del día, usa el Bs de
+  // referencia del HTML (fallbackBs). Nunca devuelve importes en otra moneda.
+  function bsText(ref, fromLabel, fallbackBs) {
+    var bs = bolivaresFromRef(ref);
+    if (bs === null) bs = Number(fallbackBs) || 0;
+    if (!bs) return '';
+    return (fromLabel ? 'Desde ' : '') + formatBs(bs);
+  }
+
+  // El precio mostrado ES el monto en bolívares (valor del día + 5 % + redondeo
+  // a 250). Si no hay valor del día, se mantiene el Bs de referencia del HTML.
+  function applyServicePrices() {
+    document.querySelectorAll('.service-price[data-ref]').forEach(function (priceEl) {
+      var text = bsText(priceEl.dataset.ref, priceEl.hasAttribute('data-ref-from'), priceEl.dataset.bs);
+      if (text) priceEl.textContent = text;
+    });
+    if (bookingService) {
+      Array.prototype.forEach.call(bookingService.options, function (option) {
+        if (!option.dataset.ref) return;
+        var fromLabel = /Colorimetr/i.test(option.value);
+        var text = bsText(option.dataset.ref, fromLabel, option.dataset.bs);
+        if (text) option.textContent = option.value + ' — ' + text;
+      });
+      if (typeof updateBookingSummary === 'function') updateBookingSummary();
+    }
+    if (rateNote) {
+      var configured = RATE_STATE.rate && RATE_STATE.rate > 0;
+      rateNote.hidden = !configured;
+      if (configured && rateValueEl) {
+        rateValueEl.textContent = Number(RATE_STATE.rate).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      if (configured && rateUpdatedEl) {
+        rateUpdatedEl.textContent = RATE_STATE.updated_at ? '· actualizada el ' + formatRateDate(RATE_STATE.updated_at) : '';
+      }
+    }
+  }
+
+  function updateRatePreview() {
+    if (!ratePreview) return;
+    var base = RATE_STATE.rate && RATE_STATE.rate > 0 ? RATE_STATE.rate : 0;
+    var typed = rateInput ? Number(rateInput.value) : 0;
+    if (isFinite(typed) && typed > 0) base = typed;
+    if (!base) { ratePreview.value = '—'; return; }
+    var bs = Math.ceil((10 * base * (1 + RATE_STATE.margin)) / RATE_STATE.round_to) * RATE_STATE.round_to;
+    ratePreview.value = 'Corte VIP ($10) → ' + formatBs(bs);
+  }
+
+  function updateRateAdminUI() {
+    if (rateInput && document.activeElement !== rateInput) {
+      rateInput.value = RATE_STATE.source === 'manual' ? RATE_STATE.rate : 0;
+    }
+    if (rateAutoInfo) {
+      if (RATE_STATE.source === 'manual') {
+        rateAutoInfo.textContent = 'Tasa manual fija activa. Pon 0 y Guardar para volver a la automática.';
+      } else if (RATE_STATE.rate > 0) {
+        rateAutoInfo.textContent = 'Automática: ' + Number(RATE_STATE.rate).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+          ' Bs/USD (' + (RATE_STATE.source || 'auto') + ')' +
+          (RATE_STATE.updated_at ? ', ' + formatRateDate(RATE_STATE.updated_at) : '');
+      } else {
+        rateAutoInfo.textContent = 'Sin tasa todavía: revisa la conexión o pulsa "Actualizar tasa ahora".';
+      }
+    }
+    if (rateSavedAt) {
+      rateSavedAt.textContent = RATE_STATE.rate > 0
+        ? 'Precios en la web: en bolívares a este valor.'
+        : 'Precios en la web: en el Bs de referencia del HTML hasta que haya valor.';
+    }
+    updateRatePreview();
+  }
+
+  function setRateState(data) {
+    RATE_STATE = {
+      rate: Number(data && data.rate) > 0 ? Number(data.rate) : 0,
+      margin: typeof (data && data.margin) === 'number' ? data.margin : 0.05,
+      round_to: Number(data && data.round_to) > 0 ? Number(data.round_to) : 250,
+      source: (data && data.source) || 'none',
+      updated_at: (data && data.updated_at) || null
+    };
+    applyServicePrices();
+    updateRateAdminUI();
+  }
+
+  function loadRate() {
+    return fetch(API_BASE + '/api/rate').then(function (res) {
+      if (!res.ok) throw res;
+      return res.json();
+    }).then(setRateState).catch(function () {
+      // Sin API: se mantiene el precio en Bs de referencia del HTML.
+    });
+  }
+
+  if (rateInput) rateInput.addEventListener('input', updateRatePreview);
+  if (rateSave) {
+    rateSave.addEventListener('click', function () {
+      var value = Number(rateInput.value);
+      if (!isFinite(value) || value < 0) {
+        showFeedback(rateFeedback, 'Ingresa una tasa válida (0 o más).');
+        return;
+      }
+      setLoading(rateSave, true);
+      apiFetch('/api/rate', { method: 'PUT', body: JSON.stringify({ rate: value }) }).then(function (res) {
+        if (!res.ok) return res.json().then(function (err) { throw err; });
+        return res.json();
+      }).then(function (data) {
+        setRateState(data);
+        setLoading(rateSave, false);
+        showFeedback(rateFeedback, value > 0 ? 'Tasa manual fijada.' : 'Vuelta a tasa automática.', 2500);
+      }).catch(function (err) {
+        setLoading(rateSave, false);
+        showFeedback(rateFeedback, (err && err.error) || 'No se pudo guardar la tasa.');
+      });
+    });
+  }
+  if (rateRefresh) {
+    rateRefresh.addEventListener('click', function () {
+      setLoading(rateRefresh, true);
+      apiFetch('/api/rate/refresh', { method: 'POST' }).then(function (res) {
+        if (!res.ok) return res.json().then(function (err) { throw err; });
+        return res.json();
+      }).then(function (data) {
+        setRateState(data);
+        setLoading(rateRefresh, false);
+        showFeedback(rateFeedback, data.rate > 0 ? 'Tasa actualizada.' : 'Las fuentes no respondieron.', 2500);
+      }).catch(function (err) {
+        setLoading(rateRefresh, false);
+        showFeedback(rateFeedback, (err && err.error) || 'No se pudo actualizar la tasa.');
+      });
     });
   }
 
@@ -461,6 +729,7 @@
     loadClients();
     loadStyles();
     loadCash();
+    loadRate();
     loadBirthdays();
   }
 
@@ -696,13 +965,23 @@
         return;
       }
       if (action === 'delete') {
-        if (!window.confirm('¿Eliminar este cliente?')) return;
-        apiFetch('/api/clients/' + clientId, { method: 'DELETE' }).then(function (res) {
-          if (!res.ok && res.status !== 204) throw res;
-          loadClients();
-          showFeedback(clientFeedback, 'Cliente eliminado.', 2500);
-        }).catch(function () {
-          showFeedback(clientFeedback, 'No se pudo eliminar el cliente.');
+        var clientName = (client && client.name) ? client.name : 'este cliente';
+        window.zaneConfirm({
+          title: 'Eliminar cliente',
+          message: '¿Eliminar a ' + clientName + ' de la lista?',
+          detail: 'Se borra su ficha y sus recordatorios pendientes. No se puede deshacer.',
+          confirmText: 'Sí, eliminar',
+          cancelText: 'Conservar',
+          danger: true
+        }).then(function (ok) {
+          if (!ok) return;
+          apiFetch('/api/clients/' + clientId, { method: 'DELETE' }).then(function (res) {
+            if (!res.ok && res.status !== 204) throw res;
+            loadClients();
+            showFeedback(clientFeedback, 'Cliente eliminado.', 2500);
+          }).catch(function () {
+            showFeedback(clientFeedback, 'No se pudo eliminar el cliente.');
+          });
         });
         return;
       }
@@ -796,14 +1075,25 @@
         document.getElementById('styleFormTitle').textContent = 'Editar estilo';
         document.getElementById('styleSubmit').textContent = 'Actualizar estilo';
       }
-      if (action === 'delete' && window.confirm('¿Eliminar este estilo?')) {
-        apiFetch('/api/styles/' + styleId, { method: 'DELETE' }).then(function (res) {
-          if (!res.ok && res.status !== 204) throw res;
-          loadStyles();
-          resetStyleForm();
-          showFeedback(document.getElementById('styleFeedback'), 'Estilo eliminado.', 2500);
-        }).catch(function () {
-          showFeedback(document.getElementById('styleFeedback'), 'No se pudo eliminar el estilo.');
+      if (action === 'delete') {
+        var styleName = button.dataset.styleName || 'este estilo';
+        window.zaneConfirm({
+          title: 'Eliminar estilo',
+          message: '¿Quitar "' + styleName + '" del catálogo?',
+          detail: 'Dejará de mostrarse en la galería de la web. No se puede deshacer.',
+          confirmText: 'Sí, eliminar',
+          cancelText: 'Conservar',
+          danger: true
+        }).then(function (ok) {
+          if (!ok) return;
+          apiFetch('/api/styles/' + styleId, { method: 'DELETE' }).then(function (res) {
+            if (!res.ok && res.status !== 204) throw res;
+            loadStyles();
+            resetStyleForm();
+            showFeedback(document.getElementById('styleFeedback'), 'Estilo eliminado.', 2500);
+          }).catch(function () {
+            showFeedback(document.getElementById('styleFeedback'), 'No se pudo eliminar el estilo.');
+          });
         });
       }
     });
@@ -845,10 +1135,12 @@
       });
       if (target === 'clients') loadClients();
       if (target === 'styles') loadStyles();
-      if (target === 'cash') loadCash();
+      if (target === 'cash') { loadCash(); loadRate(); }
       if (target === 'birthdays') loadBirthdays();
     });
   });
+
+  loadRate();
 
   if (isAdminRoute && authToken) enterDashboard();
 })();

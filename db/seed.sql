@@ -9,3 +9,8 @@ WHERE NOT EXISTS (SELECT 1 FROM styles WHERE name = 'Barba perfilada');
 INSERT INTO styles (name, category, image_url)
 SELECT 'Combo completo', 'combos', 'img/galeria/zona-lounge.jpeg'
 WHERE NOT EXISTS (SELECT 1 FROM styles WHERE name = 'Combo completo');
+
+-- Tasa USDT->Bs del día. 0 = sin configurar (la web usa el Bs de referencia del HTML).
+INSERT INTO app_settings (key, value)
+SELECT 'usdt_rate', '0'
+WHERE NOT EXISTS (SELECT 1 FROM app_settings WHERE key = 'usdt_rate');

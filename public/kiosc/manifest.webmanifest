@@ -1,0 +1,13 @@
+{
+  "name": "Zane Barber · Autoservicio",
+  "short_name": "Zane Kiosco",
+  "start_url": "/kiosc/",
+  "scope": "/kiosc/",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0B1F45",
+  "theme_color": "#0B1F45",
+  "icons": [
+    { "src": "/img/logo.png", "sizes": "150x150", "type": "image/png", "purpose": "any" }
+  ]
+}

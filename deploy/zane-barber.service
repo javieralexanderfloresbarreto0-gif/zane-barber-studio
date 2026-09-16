@@ -1,0 +1,34 @@
+# Servicio systemd para Zane Barber Studio.
+# Instalar:  sudo cp deploy/zane-barber.service /etc/systemd/system/
+#            sudo systemctl daemon-reload
+#            sudo systemctl enable --now zane-barber
+#
+# Ajusta WorkingDirectory / User si tu ruta o usuario son distintos a los del
+# resto de este paquete de despliegue (ver deploy/setup.sh y DEPLOY.md).
+
+[Unit]
+Description=Zane Barber Studio (landing + panel + kiosco)
+After=network.target
+
+[Service]
+Type=simple
+User=zane
+Group=zane
+WorkingDirectory=/opt/zane-barber-studio
+EnvironmentFile=/opt/zane-barber-studio/.env
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=zane-barber
+
+# Endurecimiento básico: el proceso solo puede escribir dentro de data/
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/zane-barber-studio/data
+
+[Install]
+WantedBy=multi-user.target
