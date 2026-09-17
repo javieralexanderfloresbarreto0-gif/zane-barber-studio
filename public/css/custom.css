@@ -2299,13 +2299,26 @@ header[id] {
   }
 
   .service-row {
-    grid-template-columns: 48px minmax(0, 1fr) auto;
-    gap: 1rem;
+    grid-template-columns: 48px minmax(0, 1fr);
+    grid-template-areas: "num copy" "num price";
+    gap: 0.25rem 1rem;
     padding: 1.5rem;
   }
 
   .service-row .service-cta {
     display: none;
+  }
+
+  .service-number { grid-area: num; }
+  .service-copy { grid-area: copy; }
+
+  /* El precio baja a su propia línea: si va al lado de la descripción,
+     estrecha demasiado el texto en pantallas chicas y además puede caer
+     bajo los botones flotantes (fixed) que viven en esa esquina. */
+  .service-price {
+    grid-area: price;
+    justify-self: start;
+    margin-top: 0.5rem;
   }
 
   .gallery-grid {
@@ -2338,6 +2351,14 @@ header[id] {
     height: 48px;
     font-size: 1.15rem;
   }
+
+  /* Los botones flotantes son fixed: cualquier contenido que caiga en esa
+     esquina al hacer scroll queda tapado (el precio de cada servicio,
+     el banner de la planta eléctrica…). Se les reserva ese ancho. */
+  .power-banner {
+    margin-right: 66px;
+  }
+
 
   .map-scroll-shield {
     display: block;
