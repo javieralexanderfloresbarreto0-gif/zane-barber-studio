@@ -511,8 +511,10 @@
     }).then(function (d) {
       es = new EventSource('/api/stream?token=' + encodeURIComponent(d.token));
 
-      // al (re)conectar, resincroniza por si se perdieron eventos
-      es.onopen = function () { setStatus('live', 'En vivo'); loadBoard(); };
+      // al (re)conectar, resincroniza por si se perdieron eventos; loadBoard()
+      // pone el estado en "Cargando…" así que "En vivo" se marca después,
+      // si no queda pisado y el badge se ve pegado en "Cargando…" para siempre.
+      es.onopen = function () { loadBoard().then(function () { setStatus('live', 'En vivo'); }); };
 
       es.addEventListener('order.submitted', function (ev) {
         var o = JSON.parse(ev.data);

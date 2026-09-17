@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS kiosc_devices (
 CREATE TABLE IF NOT EXISTS orders (
   id                 INTEGER PRIMARY KEY AUTOINCREMENT,
   code               TEXT UNIQUE,                 -- "A-047", se asigna tras el INSERT
-  client_id          INTEGER REFERENCES clients(id),
+  client_id          INTEGER REFERENCES clients(id) ON DELETE SET NULL,
   client_name        TEXT NOT NULL,               -- snapshot inmutable
   client_phone       TEXT NOT NULL,
   service_id         INTEGER NOT NULL REFERENCES services(id),

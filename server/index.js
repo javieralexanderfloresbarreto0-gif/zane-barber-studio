@@ -94,7 +94,15 @@ database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'schema.sql'), 'utf
 database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'seed.sql'), 'utf8'));
 database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'kiosc.sql'), 'utf8'));
 
-app.use(compression());
+// El SSE de /api/stream queda fuera de la compresión: gzip bufferea la
+// respuesta hasta acumular suficiente data, así que el tablero de turnos
+// se queda "Cargando…" en vez de recibir eventos al instante.
+app.use(compression({
+  filter: (request, response) => {
+    if (request.path === '/api/stream') return false;
+    return compression.filter(request, response);
+  }
+}));
 app.use(express.json({ limit: '1mb' }));
 app.use((request, response, next) => {
   response.setHeader('X-Content-Type-Options', 'nosniff');
@@ -422,9 +430,18 @@ app.put('/api/clients/:id', requireAuth, (request, response) => {
 });
 
 app.delete('/api/clients/:id', requireAuth, (request, response) => {
-  const result = database.prepare('DELETE FROM clients WHERE id = ?').run(request.params.id);
-  if (!result.changes) return response.status(404).json({ error: 'Cliente no encontrado.' });
-  response.status(204).end();
+  try {
+    const result = database.prepare('DELETE FROM clients WHERE id = ?').run(request.params.id);
+    if (!result.changes) return response.status(404).json({ error: 'Cliente no encontrado.' });
+    response.status(204).end();
+  } catch (error) {
+    if (error && error.code === 'SQLITE_CONSTRAINT_FOREIGNKEY') {
+      // No debería pasar (orders.client_id usa ON DELETE SET NULL), pero si una
+      // referencia futura no la tiene, mejor un 409 claro que un 500 mudo.
+      return response.status(409).json({ error: 'No se pudo eliminar: tiene registros relacionados.' });
+    }
+    throw error;
+  }
 });
 
 app.post('/api/backup/import', requireAuth, (request, response) => {
