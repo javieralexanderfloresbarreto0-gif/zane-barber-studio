@@ -577,7 +577,10 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000).unref();
 
-const server = app.listen(port, () => console.log(`Zane Barber Studio: http://localhost:${port}`));
+// Por defecto solo escucha en loopback: nginx hace de proxy inverso en 80/443.
+// Definir HOST=0.0.0.0 explícitamente si algún día se necesita exponerlo directo.
+const host = process.env.HOST || '127.0.0.1';
+const server = app.listen(port, host, () => console.log(`Zane Barber Studio: http://${host}:${port}`));
 
 function shutdown(signal) {
   console.log(`\n[ZANE] ${signal} recibido, cerrando…`);
