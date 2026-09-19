@@ -25,6 +25,7 @@
   var kpisEl = document.getElementById('turnosKpis');
   var historyEl = document.getElementById('turnosHistory');
   var historyCountEl = document.getElementById('turnosHistoryCount');
+  var daysEl = document.getElementById('turnosDays');
   var callNextBtn = document.getElementById('callNext');
 
   var byId = {};
@@ -131,8 +132,8 @@
         ? list.map(function (d) {
             return '<div class="device-row">' +
               '<div><strong>' + esc(d.label) + '</strong>' +
-              '<span>' + (d.active ? 'visto ' + (d.last_seen_at ? esc(d.last_seen_at) : 'nunca') : 'revocada') + '</span></div>' +
-              (d.active ? '<button type="button" class="btn-no" data-revoke="' + d.id + '">Revocar</button>' : '') +
+              '<span>visto ' + (d.last_seen_at ? esc(d.last_seen_at) : 'nunca') + '</span></div>' +
+              '<button type="button" class="btn-no" data-revoke="' + d.id + '">Revocar</button>' +
               '</div>';
           }).join('')
         : '<p class="admin-empty">Ninguna tablet registrada.</p>';
@@ -503,6 +504,33 @@
     });
   }
 
+  // ---- historial de días anteriores --------------------------------
+  var todayISO = new Date().toLocaleDateString('sv-SE'); // yyyy-mm-dd, hora local
+  function loadHistory() {
+    if (!daysEl) return;
+    api('/api/orders/history?days=30').then(function (r) {
+      if (!r.ok) throw r;
+      return r.json();
+    }).then(renderDays).catch(function () {
+      daysEl.innerHTML = '<p class="admin-empty">No se pudo cargar el historial.</p>';
+    });
+  }
+
+  function renderDays(rows) {
+    var past = rows.filter(function (d) { return d.date !== todayISO; });
+    if (!past.length) {
+      daysEl.innerHTML = '<p class="admin-empty">Todavía no hay días anteriores registrados.</p>';
+      return;
+    }
+    daysEl.innerHTML =
+      '<table class="board-days"><thead><tr><th>Día</th><th>Cortes</th><th>Cobrado</th></tr></thead><tbody>' +
+      past.map(function (d) {
+        var label = new Date(d.date + 'T12:00:00').toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short' });
+        return '<tr><td>' + label + '</td><td>' + d.cuts + '</td><td>' + money(d.revenue_bs) + '</td></tr>';
+      }).join('') +
+      '</tbody></table>';
+  }
+
   function connectStream() {
     if (es || !token()) return;
     api('/api/stream-token', { method: 'POST' }).then(function (r) {
@@ -560,6 +588,7 @@
     started = true;
     if (window.Notification && Notification.permission === 'default') Notification.requestPermission();
     loadBoard().then(connectStream);
+    loadHistory();
   }
 
   // arrancar al abrir la pestaña Turnos (y re-cargar en cada visita)
@@ -581,6 +610,12 @@
       '.board-status[data-state="off"],.board-status[data-state="error"]{color:#F0736A}',
       '.board-status[data-state="connecting"]{color:var(--zane-gold,#C8C7C9)}',
       '.board-status[data-state="live"]{color:#43C588}',
+      '.board-days{width:100%;border-collapse:collapse;font-size:.9rem}',
+      '.board-days th,.board-days td{padding:7px 10px;text-align:left;',
+      'border-bottom:1px solid var(--zane-border,rgba(255,255,255,.1))}',
+      '.board-days th{font:600 10.5px/1.3 "IBM Plex Mono",monospace;text-transform:uppercase;',
+      'letter-spacing:.04em;color:var(--zane-text-muted,#8E8E90)}',
+      '.board-days td:first-child{text-transform:capitalize}',
       '.turno-card{align-items:flex-start;gap:14px}',
       '.turno-card.is-pending{border-left:3px solid var(--accent-urgent,#D97757)}',
       '.turno-card.is-serv{border-left:3px solid #43C588}',

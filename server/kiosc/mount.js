@@ -121,6 +121,15 @@ module.exports = function mountKiosc(deps) {
         CASE payment_status WHEN 'submitted' THEN 0 WHEN 'validated' THEN 1 ELSE 2 END,
         CASE queue_status WHEN 'in_service' THEN 0 WHEN 'waiting' THEN 1 ELSE 3 END,
         queue_no, created_at`),
+    dailyHistory: database.prepare(`
+      SELECT date(done_at,'localtime') AS date,
+             COUNT(*) AS cuts,
+             SUM(amount_bs) AS revenue_bs
+      FROM orders
+      WHERE queue_status = 'done'
+      GROUP BY date(done_at,'localtime')
+      ORDER BY date DESC
+      LIMIT ?`),
     staleUnpaid: database.prepare(`
       SELECT id, code FROM orders
       WHERE payment_status = 'awaiting_payment'
@@ -368,6 +377,13 @@ module.exports = function mountKiosc(deps) {
     res.json(q.boardToday.all());
   });
 
+  // Historial diario (para ver cómo fueron los días anteriores): fecha,
+  // cantidad de cortes finalizados y total cobrado en Bs. Incluye hoy.
+  app.get('/api/orders/history', requireAuth, (req, res) => {
+    const days = Math.min(Math.max(Number(req.query.days) || 30, 1), 90);
+    res.json(q.dailyHistory.all(days));
+  });
+
   app.post('/api/orders/:id/validate', requireAuth, (req, res) => {
     const out = validateTx(Number(req.params.id), 'admin');
     if (out.error) return res.status(out.status).json({ error: out.error });
@@ -450,9 +466,11 @@ module.exports = function mountKiosc(deps) {
     res.status(201).json({ label, token }); // el token en claro se muestra UNA sola vez
   });
 
+  // Solo las activas: una vez revocada, la tablet desaparece de la lista
+  // (se conserva en la BD para no romper la referencia en orders.device_id).
   app.get('/api/kiosc/devices', requireAuth, (req, res) => {
     res.json(database.prepare(
-      'SELECT id, label, active, last_seen_at, created_at FROM kiosc_devices ORDER BY id'
+      'SELECT id, label, active, last_seen_at, created_at FROM kiosc_devices WHERE active = 1 ORDER BY id'
     ).all());
   });
 

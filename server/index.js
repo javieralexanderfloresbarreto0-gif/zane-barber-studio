@@ -94,6 +94,72 @@ database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'schema.sql'), 'utf
 database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'seed.sql'), 'utf8'));
 database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'kiosc.sql'), 'utf8'));
 
+// Arreglo puntual: en la primera versión del kiosco (15-sep) la tabla orders
+// se creó sin "ON DELETE SET NULL" en client_id. El 17-sep se corrigió en
+// db/kiosc.sql, pero CREATE TABLE IF NOT EXISTS no toca tablas que ya existen,
+// así que cualquier BD creada con esa primera versión quedó con la regla vieja
+// (RESTRICT) y no deja borrar clientes con turnos en el kiosco (409). Como no
+// hay sistema de migraciones, este parche se aplica solo una vez al arrancar:
+// si detecta la definición vieja, reconstruye la tabla con la regla correcta.
+(function fixOrdersClientFk() {
+  const row = database.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='orders'").get();
+  if (!row || row.sql.includes('ON DELETE SET NULL')) return;
+  console.warn('[ZANE] Reparando FK de orders.client_id (falta ON DELETE SET NULL)...');
+  database.pragma('foreign_keys = OFF');
+  // legacy_alter_table: sin esto, RENAME TO actualiza automáticamente la
+  // referencia de payment_events.order_id al nombre temporal, y al borrar
+  // esa tabla temporal la deja apuntando a una tabla que ya no existe.
+  database.pragma('legacy_alter_table = ON');
+  const fix = database.transaction(() => {
+    database.exec(`
+      ALTER TABLE orders RENAME TO orders_old_fk;
+      CREATE TABLE orders (
+        id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+        code               TEXT UNIQUE,
+        client_id          INTEGER REFERENCES clients(id) ON DELETE SET NULL,
+        client_name        TEXT NOT NULL,
+        client_phone       TEXT NOT NULL,
+        service_id         INTEGER NOT NULL REFERENCES services(id),
+        service_name       TEXT NOT NULL,
+        amount_bs          INTEGER NOT NULL,
+        amount_usd_cents   INTEGER NOT NULL,
+        rate_used          REAL NOT NULL,
+        currency           TEXT NOT NULL DEFAULT 'VES',
+        payment_method     TEXT NOT NULL DEFAULT 'pago_movil',
+        payment_status     TEXT NOT NULL DEFAULT 'awaiting_payment'
+             CHECK (payment_status IN
+             ('awaiting_payment','submitted','validated','rejected','expired')),
+        payment_reference  TEXT,
+        payment_proof_path TEXT,
+        payment_proof_sha  TEXT,
+        reject_reason      TEXT,
+        queue_status       TEXT
+             CHECK (queue_status IS NULL OR queue_status IN
+             ('waiting','in_service','done','no_show','cancelled')),
+        queue_no           INTEGER,
+        barber_id          INTEGER,
+        device_id          INTEGER REFERENCES kiosc_devices(id),
+        validated_by       TEXT,
+        created_at         TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        submitted_at       TEXT,
+        paid_at            TEXT,
+        called_at          TEXT,
+        done_at            TEXT
+      );
+      INSERT INTO orders SELECT * FROM orders_old_fk;
+      DROP TABLE orders_old_fk;
+      CREATE INDEX IF NOT EXISTS idx_orders_live
+        ON orders (payment_status, queue_status, created_at);
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_ref_once
+        ON orders (payment_reference) WHERE payment_reference IS NOT NULL;
+    `);
+  });
+  fix();
+  database.pragma('legacy_alter_table = OFF');
+  database.pragma('foreign_keys = ON');
+  console.warn('[ZANE] orders.client_id reparado.');
+})();
+
 // El SSE de /api/stream queda fuera de la compresión: gzip bufferea la
 // respuesta hasta acumular suficiente data, así que el tablero de turnos
 // se queda "Cargando…" en vez de recibir eventos al instante.
