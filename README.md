@@ -41,6 +41,17 @@ genera una contraseña de administrador y la muestra **una sola vez** en consola
 Guárdala. Variables disponibles en `.env.example` (`ADMIN_PASSWORD`,
 `TOKEN_SECRET`, `PORT`, `BASE_URL`, `TZ`, `TRUST_PROXY`).
 
+Si la pierdes, no hay forma de recuperarla: se restablece.
+
+```bash
+npm run reset-password                 # genera una nueva y la muestra
+npm run reset-password -- MiClaveNueva # o fija la que quieras (mín. 8 caracteres)
+```
+
+Escribe `data/admin_password.secret`. Reinicia el servidor para aplicarla. Ojo:
+un `ADMIN_PASSWORD` definido en el entorno o en `.env` tiene prioridad sobre ese
+fichero — el script avisa si detecta uno.
+
 `TZ` (por defecto `America/Caracas`) fija la zona horaria del proceso: de ella
 dependen el agrupado "hoy" de la cola de turnos y los cierres de caja. En un
 servidor en UTC sin `TZ`, el día rotaría a las 20:00 hora de Venezuela.

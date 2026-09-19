@@ -90,6 +90,21 @@ sudo journalctl -u zane-barber -f      # logs en vivo, Ctrl+C para salir
 La primera vez, si no pusiste `ADMIN_PASSWORD`, la contraseña generada sale
 **una sola vez** en estos logs — guárdala ya.
 
+### Si perdiste la contraseña del panel
+
+No se puede recuperar (no está en el repo ni en ningún otro sitio). Se
+restablece desde la propia VM:
+
+```bash
+cd /opt/zane-barber-studio
+sudo -u zane npm run reset-password -- MiClaveNueva   # o sin argumento, la genera
+sudo systemctl restart zane-barber
+```
+
+Si tienes `ADMIN_PASSWORD` puesto en `/opt/zane-barber-studio/.env`, ese valor
+manda sobre el fichero: cámbialo allí y reinicia, o bórralo de `.env` para que
+valga el que generó el script.
+
 ## 6. nginx + dominio + HTTPS
 
 1. Apunta tu dominio (registro **A**) a la IP pública de la VM. Espera a que
