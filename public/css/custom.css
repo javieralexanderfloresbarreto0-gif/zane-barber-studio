@@ -2918,3 +2918,284 @@ textarea:focus-visible,
 @media (max-width: 400px) {
   .zdate-panel { width: 264px; }
 }
+
+/* ==========================================================================
+   MÓVIL — Ajustes de diseño para teléfonos (≤ 767px)
+   Barra inferior de acciones en lugar de botones flotantes que tapaban
+   contenido, hero más compacto, galería en 2 columnas y tarjetas más ligeras.
+   ========================================================================== */
+.float-label {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  html {
+    scroll-padding-top: 72px;
+  }
+
+  body {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .container {
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+  }
+
+  /* ---- Navbar ---- */
+  .navbar-zane .brand-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+  }
+
+  .navbar-zane .navbar-toggler {
+    border-radius: 12px;
+    padding: 0.4rem 0.6rem;
+  }
+
+  /* ---- Hero ---- */
+  .hero-zane {
+    padding: 2.5rem 0 2.5rem;
+  }
+
+  .hero-zane .min-vh-80 {
+    min-height: auto !important;
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .hero-ambient-glow {
+    width: 360px;
+    height: 360px;
+    right: -120px;
+    top: -120px;
+  }
+
+  .hero-badge {
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.9rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .hero-title {
+    font-size: clamp(2.6rem, 13vw, 3.4rem);
+    line-height: 0.98;
+  }
+
+  .hero-lead {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .power-banner {
+    margin-right: 0;
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .hero-cta--primary {
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .hero-cta--secondary {
+    justify-content: center;
+    padding: 0.85rem 1.5rem;
+    border: 1px solid var(--zane-border-gold);
+    border-radius: var(--radius-pill);
+  }
+
+  /* ---- Títulos de sección ---- */
+  .section-title {
+    font-size: clamp(1.9rem, 9vw, 2.4rem);
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+  }
+
+  /* ---- Servicios: número pequeño arriba, tarjeta a todo el ancho ---- */
+  .service-row {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "num" "copy" "price";
+    gap: 0.35rem;
+    padding: 1.25rem 1.25rem 1.35rem;
+    border-radius: 18px;
+  }
+
+  .service-number {
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    opacity: 0.7;
+  }
+
+  .service-row .service-cta {
+    display: none;
+  }
+
+  /* ---- Galería: filtros en carrusel horizontal + rejilla de 2 columnas ---- */
+  .gallery-filters {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-left: -1.1rem;
+    margin-right: -1.1rem;
+    padding: 0 1.1rem 0.25rem;
+    scroll-snap-type: x proximity;
+  }
+
+  .gallery-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gallery-filter {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .gallery-item {
+    border-radius: 14px;
+    aspect-ratio: 3 / 4;
+  }
+
+  .gallery-item figcaption {
+    font-size: 0.78rem;
+    padding: 0.6rem 0.7rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ---- Horarios: día arriba, hora abajo; sin cortes raros ---- */
+  .hours-card {
+    padding: 1.25rem;
+    border-radius: 18px;
+  }
+
+  .hours-row {
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .hours-day {
+    white-space: nowrap;
+    font-size: 1rem;
+  }
+
+  .hours-value {
+    white-space: nowrap;
+    font-size: 0.95rem;
+    text-align: right;
+  }
+
+  /* ---- FAQ ---- */
+  .faq-layout {
+    gap: 1.5rem;
+  }
+
+  /* ---- Contacto ---- */
+  .contact-shell {
+    padding: 1.4rem 1.15rem;
+    border-radius: 20px;
+  }
+
+  .contact-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .contact-list a,
+  .contact-list span {
+    overflow-wrap: anywhere;
+  }
+
+  .map-container {
+    min-height: 240px;
+    border-radius: 16px;
+  }
+
+  /* ---- Footer compacto ---- */
+  .footer-zane {
+    padding-top: 3rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.25rem;
+  }
+
+  .footer-links li {
+    margin: 0;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+    margin-top: 2rem !important;
+  }
+
+  .footer-bottom .text-muted {
+    color: var(--zane-text-muted) !important;
+  }
+
+  /* ---- Barra inferior de acciones (sustituye a los botones flotantes) ---- */
+  .floating-actions {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    flex-direction: row;
+    gap: 0.6rem;
+    padding: 0.65rem 1rem calc(0.65rem + env(safe-area-inset-bottom));
+    background: rgba(15, 17, 21, 0.86);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--zane-border);
+  }
+
+  .booking-float,
+  .whatsapp-float {
+    flex: 1 1 0;
+    width: auto;
+    height: 50px;
+    border-radius: 14px;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    box-shadow: none;
+  }
+
+  .float-label {
+    display: inline;
+    font-family: var(--zane-font);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* El modal de reserva aparece como hoja inferior */
+  .booking-modal .modal-dialog {
+    margin: 0;
+    min-height: 100%;
+    align-items: flex-end;
+  }
+
+  .booking-modal .modal-content {
+    border-radius: 22px 22px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
