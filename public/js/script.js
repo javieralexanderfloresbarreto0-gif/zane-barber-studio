@@ -633,6 +633,13 @@
     }
   }
 
+  // Solo se enlaza lo que el barbero pegó desde Google Maps (el servidor ya lo
+  // valida); aquí se exige https para no meter nunca un javascript: en el href.
+  function safeMapsUrl(value) {
+    var url = String(value || '').trim();
+    return /^https:\/\//i.test(url) ? url : '';
+  }
+
   function clientCardHTML(client) {
     var pendingClass = isPending(client) ? ' is-pending' : '';
     var status = isPending(client) ? '<span class="pending-badge">Recordatorio pendiente</span>' : '';
@@ -643,11 +650,16 @@
     if (client.sides_machine) notes.push(client.sides_machine);
     if (client.top_finish) notes.push(client.top_finish);
     var extra = notes.length ? '<p>' + escapeHTML(notes.join(' · ')) + '</p>' : '';
+    var mapsUrl = safeMapsUrl(client.maps_url);
+    var mapsButton = mapsUrl
+      ? '<a class="client-action-link" href="' + escapeHTML(mapsUrl) + '" target="_blank" rel="noopener noreferrer" aria-label="Cómo llegar a la ubicación de ' + escapeHTML(client.name) + '" title="Cómo llegar"><i class="fas fa-location-dot"></i></a>'
+      : '';
     return '<article class="client-item' + pendingClass + '">' +
       '<div><h4>' + escapeHTML(client.name) + '</h4><p>' + escapeHTML(phone) + ' · ' + escapeHTML(service) + '</p>' + extra + '</div>' +
       '<div class="client-reminder">Próximo aviso: <strong>' + formatDate(client.next_reminder_date || addDays(lastCut, 15)) + '</strong>' + status + '</div>' +
       '<div class="client-actions">' +
         '<button type="button" data-client-action="send" data-client-id="' + client.id + '" aria-label="Enviar recordatorio a ' + escapeHTML(client.name) + '"><i class="fab fa-whatsapp"></i></button>' +
+        mapsButton +
         '<button type="button" data-client-action="edit" data-client-id="' + client.id + '" aria-label="Editar a ' + escapeHTML(client.name) + '"><i class="fas fa-pen"></i></button>' +
         '<button type="button" data-client-action="delete" data-client-id="' + client.id + '" aria-label="Eliminar a ' + escapeHTML(client.name) + '"><i class="fas fa-trash"></i></button>' +
       '</div>' +
@@ -868,7 +880,8 @@
         phone: document.getElementById('clientPhone').value.trim(),
         birth_date: document.getElementById('clientBirthDate').value || null,
         last_cut_date: document.getElementById('clientLastCut').value,
-        last_service: document.getElementById('clientService').value.trim()
+        last_service: document.getElementById('clientService').value.trim(),
+        maps_url: document.getElementById('clientMapsUrl').value.trim()
       };
       var promise = id
         ? apiFetch('/api/clients/' + id, { method: 'PUT', body: JSON.stringify(data) })
@@ -994,6 +1007,7 @@
         document.getElementById('clientService').value = client.last_service || '';
         document.getElementById('clientSidesMachine').value = client.sides_machine || '';
         document.getElementById('clientTopFinish').value = client.top_finish || '';
+        document.getElementById('clientMapsUrl').value = client.maps_url || '';
         if (clientFormTitle) clientFormTitle.textContent = 'Editar cliente';
         var submit = document.getElementById('clientSubmit');
         if (submit) submit.textContent = 'Actualizar cliente';

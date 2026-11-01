@@ -1965,6 +1965,17 @@ header[id] {
   font-family: var(--zane-font);
 }
 
+.client-field-wide {
+  grid-column: 1 / -1;
+}
+
+.client-field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--zane-text-muted);
+}
+
 .client-fields input:focus,
 .client-fields select:focus,
 .client-tools input:focus,
@@ -2050,7 +2061,8 @@ header[id] {
   gap: 0.4rem;
 }
 
-.client-actions button {
+.client-actions button,
+.client-actions .client-action-link {
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -2064,7 +2076,13 @@ header[id] {
   transition: all var(--transition-fast);
 }
 
-.client-actions button:hover {
+.client-actions .client-action-link {
+  text-decoration: none;
+}
+
+.client-actions button:hover,
+.client-actions .client-action-link:hover,
+.client-actions .client-action-link:focus-visible {
   border-color: var(--zane-gold);
   color: var(--zane-gold);
 }

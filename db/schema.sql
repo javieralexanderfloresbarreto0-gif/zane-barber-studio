@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS clients (
   birth_date TEXT,
   last_cut_date TEXT NOT NULL,
   last_service TEXT NOT NULL,
+  maps_url TEXT,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

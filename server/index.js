@@ -160,6 +160,15 @@ database.exec(fs.readFileSync(path.join(rootDirectory, 'db', 'kiosc.sql'), 'utf8
   console.warn('[ZANE] orders.client_id reparado.');
 })();
 
+// Columna añadida después de la primera versión: CREATE TABLE IF NOT EXISTS
+// no la agrega a BD ya creadas, así que se añade aquí si falta.
+(function ensureClientMapsUrl() {
+  const columns = database.prepare('PRAGMA table_info(clients)').all();
+  if (!columns.some((column) => column.name === 'maps_url')) {
+    database.exec('ALTER TABLE clients ADD COLUMN maps_url TEXT');
+  }
+})();
+
 // El SSE de /api/stream queda fuera de la compresión: gzip bufferea la
 // respuesta hasta acumular suficiente data, así que el tablero de turnos
 // se queda "Cargando…" en vez de recibir eventos al instante.
@@ -253,15 +262,43 @@ function normalizePhone(phone) {
   return digits;
 }
 
+// Enlace de Google Maps que el barbero pega a mano en la ficha (el que da
+// "Compartir" en la app: maps.app.goo.gl/..., goo.gl/maps/..., google.com/maps...).
+// Devuelve el enlace limpio, null si viene vacío o undefined si no es de Google Maps.
+function normalizeMapsUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  // La app a veces copia texto + enlace ("Zane Barber… https://maps.app.goo.gl/…")
+  const match = raw.match(/https?:\/\/\S+/i);
+  if (!match || match[0].length > 500) return undefined;
+  let url;
+  try {
+    url = new URL(match[0]);
+  } catch (error) {
+    return undefined;
+  }
+  const host = url.hostname.toLowerCase();
+  const isGoogleHost = /^(www\.|maps\.)?google\.[a-z]{2,3}(\.[a-z]{2})?$/.test(host);
+  const ok = host === 'maps.app.goo.gl'
+    || (host === 'goo.gl' && url.pathname.startsWith('/maps'))
+    || (isGoogleHost && (host.startsWith('maps.') || url.pathname.startsWith('/maps')));
+  if (!ok) return undefined;
+  url.protocol = 'https:';
+  return url.toString();
+}
+
 function clientPayload(body) {
   return {
     name: String(body.name || '').trim().slice(0, 120),
     phone: normalizePhone(body.phone).slice(0, 20),
     birth_date: body.birth_date || null,
     last_cut_date: body.last_cut_date,
-    last_service: String(body.last_service || '').trim().slice(0, 120)
+    last_service: String(body.last_service || '').trim().slice(0, 120),
+    maps_url: normalizeMapsUrl(body.maps_url)
   };
 }
+
+const INVALID_MAPS_URL = 'El enlace de ubicación debe ser uno de Google Maps (pégalo desde "Compartir").';
 
 function validDate(dateString, allowNull) {
   if (!dateString) return allowNull;
@@ -468,9 +505,10 @@ app.post('/api/clients', requireAuth, (request, response) => {
   if (!validDate(payload.last_cut_date, false) || !validDate(payload.birth_date, true)) {
     return response.status(400).json({ error: 'Una de las fechas no es válida.' });
   }
+  if (payload.maps_url === undefined) return response.status(400).json({ error: INVALID_MAPS_URL });
   try {
-    const result = database.prepare(`INSERT INTO clients (name, phone, birth_date, last_cut_date, last_service)
-      VALUES (@name, @phone, @birth_date, @last_cut_date, @last_service)`).run(payload);
+    const result = database.prepare(`INSERT INTO clients (name, phone, birth_date, last_cut_date, last_service, maps_url)
+      VALUES (@name, @phone, @birth_date, @last_cut_date, @last_service, @maps_url)`).run(payload);
     response.status(201).json(getClient(result.lastInsertRowid));
   } catch (error) {
     response.status(409).json({ error: 'Ese teléfono ya está registrado.' });
@@ -485,9 +523,11 @@ app.put('/api/clients/:id', requireAuth, (request, response) => {
   if (!validDate(payload.last_cut_date, false) || !validDate(payload.birth_date, true)) {
     return response.status(400).json({ error: 'Una de las fechas no es válida.' });
   }
+  if (payload.maps_url === undefined) return response.status(400).json({ error: INVALID_MAPS_URL });
   try {
     const result = database.prepare(`UPDATE clients SET name=@name, phone=@phone, birth_date=@birth_date,
-      last_cut_date=@last_cut_date, last_service=@last_service, updated_at=CURRENT_TIMESTAMP WHERE id=@id`).run(payload);
+      last_cut_date=@last_cut_date, last_service=@last_service, maps_url=@maps_url,
+      updated_at=CURRENT_TIMESTAMP WHERE id=@id`).run(payload);
     if (!result.changes) return response.status(404).json({ error: 'Cliente no encontrado.' });
     response.json(getClient(request.params.id));
   } catch (error) {
@@ -512,13 +552,15 @@ app.delete('/api/clients/:id', requireAuth, (request, response) => {
 
 app.post('/api/backup/import', requireAuth, (request, response) => {
   if (!Array.isArray(request.body.clients)) return response.status(400).json({ error: 'El respaldo no tiene un formato válido.' });
-  const insertClient = database.prepare(`INSERT INTO clients (name, phone, birth_date, last_cut_date, last_service)
-    VALUES (@name, @phone, @birth_date, @last_cut_date, @last_service)
+  // Un respaldo viejo (sin maps_url) no borra la ubicación ya guardada.
+  const insertClient = database.prepare(`INSERT INTO clients (name, phone, birth_date, last_cut_date, last_service, maps_url)
+    VALUES (@name, @phone, @birth_date, @last_cut_date, @last_service, @maps_url)
     ON CONFLICT(phone) DO UPDATE SET name=excluded.name, birth_date=excluded.birth_date,
-    last_cut_date=excluded.last_cut_date, last_service=excluded.last_service, updated_at=CURRENT_TIMESTAMP`);
+    last_cut_date=excluded.last_cut_date, last_service=excluded.last_service,
+    maps_url=COALESCE(excluded.maps_url, clients.maps_url), updated_at=CURRENT_TIMESTAMP`);
   const validClients = request.body.clients.map(clientPayload).filter((client) => (
     client.name && client.phone.length >= 10 && client.last_cut_date && client.last_service
-  ));
+  )).map((client) => ({ ...client, maps_url: client.maps_url || null }));
   const importClients = database.transaction((clients) => clients.forEach((client) => insertClient.run(client)));
   try {
     importClients(validClients);
