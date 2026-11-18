@@ -179,6 +179,14 @@ app.use((request, response, next) => {
   response.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   next();
 });
+app.use((request, response, next) => {
+  const blocked = ['/data', '/db', '/node_modules', '/_headers'];
+  if (blocked.some((prefix) => request.path.startsWith(prefix))) {
+    return response.status(403).json({ error: 'Acceso denegado.' });
+  }
+  next();
+});
+
 // Estáticos de public/ (css, js, img, vendor). index:false para que index.html
 // pase por el render que inyecta BASE_URL. Las librerías vendorizadas llevan
 // filename estable => se pueden cachear con fuerza; imágenes, una semana.
@@ -195,14 +203,6 @@ app.use(express.static(publicDirectory, {
     }
   }
 }));
-
-app.use((request, response, next) => {
-  const blocked = ['/data', '/db', '/node_modules'];
-  if (blocked.some((prefix) => request.path.startsWith(prefix))) {
-    return response.status(403).json({ error: 'Acceso denegado.' });
-  }
-  next();
-});
 
 // index.html se sirve renderizado: se sustituye {{BASE_URL}} por el dominio real
 // (env BASE_URL, o protocolo+host de la petición) para las etiquetas SEO/OG/JSON-LD.

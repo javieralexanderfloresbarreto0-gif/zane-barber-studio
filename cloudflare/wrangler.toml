@@ -1,0 +1,27 @@
+# Configuración del Worker de Zane Barber Studio.
+# El despliegue lo hace deploy/../cloudflare/desplegar.sh, que completa
+# database_id la primera vez. Para cambiar el nombre de la dirección pública
+# (zanebarber.<tu-subdominio>.workers.dev), cambia "name".
+name = "zanebarber"
+main = "src/worker.js"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Web, panel y kiosco: los mismos archivos de public/ que usa el servidor Node.
+# El Worker atiende primero solo lo dinámico; el resto lo sirve Cloudflare directo.
+[assets]
+directory = "../public"
+binding = "ASSETS"
+run_worker_first = ["/", "/index.html", "/admin", "/admin/*", "/kiosc", "/kiosc/", "/api/*", "/robots.txt", "/sitemap.xml"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "zane-db"
+database_id = "PENDIENTE"
+
+# Cada 30 min: tasa USDT, órdenes vencidas y limpieza de intentos.
+[triggers]
+crons = ["*/30 * * * *"]
+
+[observability]
+enabled = true
