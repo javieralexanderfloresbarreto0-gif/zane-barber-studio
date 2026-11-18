@@ -61,3 +61,18 @@ CREATE TABLE IF NOT EXISTS app_settings (
 CREATE INDEX IF NOT EXISTS idx_clients_birth_month ON clients (birth_date);
 CREATE INDEX IF NOT EXISTS idx_clients_last_cut ON clients (last_cut_date);
 CREATE INDEX IF NOT EXISTS idx_preferences_client ON haircut_preferences (client_id);
+
+-- Citas reservadas desde la web. Una hora solo puede tener una cita activa.
+CREATE TABLE IF NOT EXISTS appointments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  client_name TEXT NOT NULL,
+  client_phone TEXT NOT NULL,
+  service TEXT NOT NULL,
+  appt_date TEXT NOT NULL,
+  appt_time TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'booked' CHECK (status IN ('booked', 'done', 'cancelled', 'no_show')),
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_appt_slot_active
+  ON appointments (appt_date, appt_time) WHERE status IN ('booked', 'done');
+CREATE INDEX IF NOT EXISTS idx_appt_date ON appointments (appt_date, appt_time);

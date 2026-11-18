@@ -407,6 +407,114 @@ app.post('/api/login', (request, response) => {
   response.json({ token: signToken({ role: 'admin' }) });
 });
 
+// ---------------------------------------------------------------------------
+// Agenda: horarios por día, disponibilidad pública y reserva de citas.
+// ---------------------------------------------------------------------------
+const WEEKDAY_SLOTS = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+const SATURDAY_SLOTS = WEEKDAY_SLOTS.concat('19:00');
+const BOOKING_WINDOW_DAYS = 60;
+const bookingAttempts = new Map();
+
+function slotLabel(time) {
+  const hour = Number(time.slice(0, 2));
+  return `${hour % 12 || 12}:${time.slice(3)} ${hour < 12 ? 'AM' : 'PM'}`;
+}
+
+function localDateString(date) {
+  const pad = (value) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+// Devuelve las horas ofrecidas ese día (vacío si es domingo o fecha inválida / fuera de ventana).
+function slotsForDate(dateString) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString || '')) return null;
+  const day = new Date(dateString + 'T12:00:00');
+  if (Number.isNaN(day.getTime()) || localDateString(day) !== dateString) return null;
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  const diffDays = Math.round((day - today) / 86400000);
+  if (diffDays < 0 || diffDays > BOOKING_WINDOW_DAYS) return [];
+  const weekday = day.getDay();
+  if (weekday === 0) return [];
+  const slots = weekday === 6 ? SATURDAY_SLOTS : WEEKDAY_SLOTS;
+  if (diffDays > 0) return slots;
+  const now = new Date();
+  const current = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  return slots.filter((time) => time > current);
+}
+
+app.get('/api/availability', (request, response) => {
+  const date = String(request.query.date || '');
+  const offered = slotsForDate(date);
+  if (offered === null) return response.status(400).json({ error: 'La fecha no es válida.' });
+  const taken = new Set(database.prepare(
+    `SELECT appt_time FROM appointments WHERE appt_date = ? AND status IN ('booked', 'done')`
+  ).all(date).map((row) => row.appt_time));
+  response.json({
+    date,
+    open: offered.length > 0,
+    slots: offered.map((time) => ({ time, label: slotLabel(time), free: !taken.has(time) }))
+  });
+});
+
+app.post('/api/appointments', (request, response) => {
+  const ip = request.ip || 'unknown';
+  const now = Date.now();
+  const recent = (bookingAttempts.get(ip) || []).filter((stamp) => now - stamp < 60 * 60 * 1000);
+  if (recent.length >= 6) {
+    return response.status(429).json({ error: 'Demasiadas solicitudes. Escríbenos por WhatsApp.' });
+  }
+  recent.push(now);
+  bookingAttempts.set(ip, recent);
+
+  const body = request.body || {};
+  const name = String(body.name || '').trim().slice(0, 120);
+  const phone = normalizePhone(body.phone).slice(0, 20);
+  const service = String(body.service || '').trim().slice(0, 120);
+  const date = String(body.date || '');
+  const time = String(body.time || '');
+  if (!name || !service) return response.status(400).json({ error: 'Faltan datos de la reserva.' });
+  if (phone.length < 10) return response.status(400).json({ error: 'El teléfono no es válido.' });
+  const offered = slotsForDate(date);
+  if (!offered || !offered.includes(time)) {
+    return response.status(400).json({ error: 'Esa fecha u hora no está disponible.' });
+  }
+  try {
+    const result = database.prepare(`INSERT INTO appointments (client_name, client_phone, service, appt_date, appt_time)
+      VALUES (?, ?, ?, ?, ?)`).run(name, phone, service, date, time);
+    response.status(201).json({ id: result.lastInsertRowid, date, time, label: slotLabel(time) });
+  } catch (error) {
+    if (String(error.message).includes('UNIQUE')) {
+      return response.status(409).json({ error: 'Esa hora acaba de ser reservada. Elige otra.' });
+    }
+    throw error;
+  }
+});
+
+app.get('/api/appointments', requireAuth, (request, response) => {
+  const rows = database.prepare(`SELECT * FROM appointments
+    WHERE appt_date >= date('now', 'localtime', '-1 day') AND status != 'cancelled'
+    ORDER BY appt_date, appt_time`).all();
+  response.json(rows.map((row) => ({ ...row, label: slotLabel(row.appt_time) })));
+});
+
+app.put('/api/appointments/:id/status', requireAuth, (request, response) => {
+  const status = String(request.body && request.body.status);
+  if (!['booked', 'done', 'cancelled', 'no_show'].includes(status)) {
+    return response.status(400).json({ error: 'Estado no válido.' });
+  }
+  try {
+    const result = database.prepare('UPDATE appointments SET status = ? WHERE id = ?').run(status, request.params.id);
+    if (!result.changes) return response.status(404).json({ error: 'Cita no encontrada.' });
+    response.json({ ok: true });
+  } catch (error) {
+    if (String(error.message).includes('UNIQUE')) {
+      return response.status(409).json({ error: 'Esa hora ya está ocupada por otra cita.' });
+    }
+    throw error;
+  }
+});
+
 app.get('/api/health', (request, response) => {
   response.json({ ok: true, database: 'sqlite' });
 });
