@@ -3214,6 +3214,7 @@ textarea:focus-visible,
    ========================================================================== */
 body.admin-route #mainNav,
 body.admin-route .hero-zane,
+body.admin-route .perks,
 body.admin-route #servicios,
 body.admin-route #galeria,
 body.admin-route #preguntas,
@@ -3856,4 +3857,250 @@ body.admin-route .board-history summary {
 body:not(.admin-route) .admin-brand,
 body:not(.admin-route) .admin-site-link {
   display: none;
+}
+
+/* ==========================================================================
+   MEJORAS VISUALES DE LA PORTADA
+   ========================================================================== */
+
+/* ---- Franja de ventajas bajo la portada ---- */
+.perks {
+  position: relative;
+  z-index: 2;
+  background: var(--zane-bg-main);
+  padding: 0 0 3.5rem;
+}
+
+.perks-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.perk {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.1rem 1.2rem;
+  background: linear-gradient(160deg, rgba(33, 58, 99, 0.55), rgba(18, 42, 80, 0.35));
+  border: 1px solid var(--zane-border);
+  border-radius: 18px;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.perk:hover {
+  border-color: var(--zane-border-gold);
+  transform: translateY(-2px);
+}
+
+.perk-icon {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(var(--zane-gold-rgb), 0.1);
+  border: 1px solid var(--zane-border-gold);
+  color: var(--zane-gold-light);
+  font-size: 1.1rem;
+}
+
+.perk strong {
+  display: block;
+  font-family: var(--zane-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.perk small {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  color: var(--zane-text-muted);
+  line-height: 1.35;
+}
+
+@media (max-width: 991px) {
+  .perks-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---- Estado "Abierto ahora" y día de hoy en el horario ---- */
+.open-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1rem auto 0;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #F0B48A;
+  background: rgba(217, 119, 87, 0.12);
+  border: 1px solid rgba(217, 119, 87, 0.35);
+}
+
+.open-status.is-open {
+  color: #6FDCA6;
+  background: rgba(67, 197, 136, 0.12);
+  border-color: rgba(67, 197, 136, 0.35);
+}
+
+.open-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+}
+
+.open-status.is-open .open-dot {
+  animation: open-pulse 2s ease-out infinite;
+}
+
+@keyframes open-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(111, 220, 166, 0.55); }
+  100% { box-shadow: 0 0 0 10px rgba(111, 220, 166, 0); }
+}
+
+.hours-row.is-today {
+  position: relative;
+  margin: 0 -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 14px;
+  background: rgba(var(--zane-gold-rgb), 0.07);
+  border-bottom-color: transparent;
+}
+
+.hours-row.is-today .hours-day::after {
+  content: 'Hoy';
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-family: var(--zane-font);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  vertical-align: middle;
+  color: #0F1115;
+  background: var(--zane-gold);
+}
+
+/* ---- Aparición suave al hacer scroll (solo si JS la activa) ---- */
+.reveal {
+  transition:
+    opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0ms),
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0ms);
+}
+
+.reveal:not(.is-in) {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+/* ---- Portada con foto en teléfono y tablet ---- */
+@media (max-width: 991px) {
+  .hero-zane {
+    min-height: 88vh;
+    min-height: 88svh;
+    align-items: flex-end;
+    background:
+      linear-gradient(180deg, rgba(15, 17, 21, 0.25) 0%, rgba(15, 17, 21, 0.55) 40%, rgba(15, 17, 21, 0.96) 78%, var(--zane-bg-main) 100%),
+      url('../img/galeria/fade-detalle.jpeg') center 20% / cover no-repeat,
+      var(--zane-bg-main);
+  }
+
+  .hero-zane .min-vh-80 {
+    min-height: 0 !important;
+  }
+
+  .hero-zane .hero-badge {
+    background: rgba(15, 17, 21, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .hero-ambient-glow {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-zane {
+    padding: 6rem 0 1.5rem;
+  }
+
+  .perks {
+    padding-bottom: 2.5rem;
+  }
+
+  .perks-list {
+    gap: 0.6rem;
+  }
+
+  .perk {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.95rem;
+    border-radius: 16px;
+  }
+
+  .perk-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 1rem;
+  }
+
+  .perk strong {
+    font-size: 1.02rem;
+  }
+
+  .perk small {
+    font-size: 0.76rem;
+  }
+
+  .hours-row.is-today {
+    margin: 0 -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .hours-row.is-today .hours-day::after {
+    margin-left: 0.35rem;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .hours-day {
+    font-size: 0.95rem;
+  }
+
+  .hours-value {
+    font-size: 0.9rem;
+    margin-left: auto;
+  }
+
+  .hours-row {
+    flex-wrap: wrap;
+    row-gap: 0.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .open-status.is-open .open-dot {
+    animation: none;
+  }
 }
