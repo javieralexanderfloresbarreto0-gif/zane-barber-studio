@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const Database = require('better-sqlite3');
+const os = require('os');
 
 const app = express();
 // Detrás de un proxy inverso (nginx, Cloudflare…) define TRUST_PROXY (un número
@@ -515,6 +516,19 @@ app.put('/api/appointments/:id/status', requireAuth, (request, response) => {
   }
 });
 
+// Direcciones de esta computadora en la red local, para registrar tablets.
+function lanUrls() {
+  return Object.values(os.networkInterfaces()).flat()
+    .filter((net) => net && net.family === 'IPv4' && !net.internal)
+    .map((net) => `http://${net.address}:${port}`);
+}
+
+// Solo tiene sentido si el servidor escucha en la red (HOST=0.0.0.0).
+app.get('/api/lan-urls', requireAuth, (request, response) => {
+  const exposed = host === '0.0.0.0' || (host !== '127.0.0.1' && host !== 'localhost');
+  response.json({ exposed, urls: exposed ? lanUrls() : [] });
+});
+
 app.get('/api/health', (request, response) => {
   response.json({ ok: true, database: 'sqlite' });
 });
@@ -771,7 +785,12 @@ setInterval(() => {
 // Por defecto solo escucha en loopback: nginx hace de proxy inverso en 80/443.
 // Definir HOST=0.0.0.0 explícitamente si algún día se necesita exponerlo directo.
 const host = process.env.HOST || '127.0.0.1';
-const server = app.listen(port, host, () => console.log(`Zane Barber Studio: http://${host}:${port}`));
+const server = app.listen(port, host, () => {
+  console.log(`Zane Barber Studio: http://${host}:${port}`);
+  if (host === '0.0.0.0') {
+    lanUrls().forEach((url) => console.log(`[ZANE] Desde la tablet (misma red Wi-Fi): ${url}/kiosc/`));
+  }
+});
 
 function shutdown(signal) {
   console.log(`\n[ZANE] ${signal} recibido, cerrando…`);
