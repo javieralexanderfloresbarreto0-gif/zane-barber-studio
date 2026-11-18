@@ -18,8 +18,17 @@
 </head>
 <body>
   <header class="k-top">
-    <img src="/img/logo.png" alt="Zane Barber Studio" width="40" height="40">
-    <span>ZANE<strong>BARBER</strong></span>
+    <div class="k-brand">
+      <img src="/img/logo.png" alt="Zane Barber Studio" width="44" height="44">
+      <span>ZANE<strong>BARBER</strong></span>
+    </div>
+    <ol class="k-steps" id="steps" aria-label="Pasos" hidden>
+      <li data-step="menu"><b>1</b><span>Servicio</span></li>
+      <li data-step="datos"><b>2</b><span>Tus datos</span></li>
+      <li data-step="pago"><b>3</b><span>Pago</span></li>
+      <li data-step="waiting"><b>4</b><span>Turno</span></li>
+    </ol>
+    <time class="k-clock" id="clock"></time>
   </header>
   <main id="app" aria-live="polite"></main>
   <div id="toast" class="k-toast" hidden></div>

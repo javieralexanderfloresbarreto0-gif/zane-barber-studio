@@ -559,7 +559,7 @@
             <span class="eyebrow">Panel de Control Interno</span>
             <h2 class="section-title">Administración del Estudio</h2>
           </div>
-          <button type="button" class="btn btn-outline-zane" id="adminLogout">
+          <button type="button" class="btn btn-outline-zane" id="adminLogout" aria-label="Cerrar sesión">
             <i class="fas fa-sign-out-alt me-1"></i> Cerrar sesión
           </button>
         </div>
@@ -572,6 +572,10 @@
         </div>
 
         <nav class="admin-tabs" role="tablist">
+          <div class="admin-brand" aria-hidden="true">
+            <img src="img/logo.png" alt="" width="36" height="36">
+            <span>ZANE<b>BARBER</b><small>Panel</small></span>
+          </div>
           <button type="button" class="admin-tab is-active" data-panel-tab="clients" role="tab">
             <span><i class="fas fa-users me-1"></i> Clientes</span>
             <span class="tab-count" id="tabCountClients">0</span>
@@ -595,6 +599,7 @@
             <span><i class="fas fa-birthday-cake me-1"></i> Cumpleaños</span>
             <span class="tab-count" id="tabCountBirthdays">0</span>
           </button>
+          <a href="/" class="admin-site-link"><i class="fas fa-arrow-up-right-from-square me-1" aria-hidden="true"></i> Ver sitio web</a>
         </nav>
 
         <!-- CLIENTES -->
