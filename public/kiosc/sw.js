@@ -2,7 +2,7 @@
    El HTML/CSS/JS se sirve desde caché al instante y se revalida en segundo
    plano (stale-while-revalidate): un cambio de código aparece en la 2ª carga,
    sin tener que tocar este archivo. Sube CACHE solo para forzar un borrón. */
-var CACHE = 'zane-kiosc-v7';
+var CACHE = 'zane-kiosc-v8';
 var SHELL = [
   '/kiosc/',
   '/kiosc/index.html',
