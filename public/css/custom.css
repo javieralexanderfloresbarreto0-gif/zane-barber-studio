@@ -3240,8 +3240,17 @@ body.admin-route .admin-section {
 }
 
 body.admin-route .admin-section > .container {
-  max-width: 1440px;
+  max-width: none;
+  width: 100%;
   padding: 0;
+}
+
+/* El contenido usa todo el ancho, pero con un tope cómodo de lectura */
+body.admin-route .admin-dashboard > .admin-heading,
+body.admin-route .admin-dashboard > .admin-toolbar,
+body.admin-route .admin-dashboard > [data-panel-view] {
+  width: 100%;
+  max-width: 1480px;
 }
 
 /* ---- Acceso ---- */
@@ -3527,6 +3536,21 @@ body.admin-route .client-form-actions .btn,
 body.admin-route .client-tools .btn {
   border-radius: 12px;
   min-height: 46px;
+}
+
+body.admin-route .client-tools {
+  flex-wrap: wrap;
+}
+
+body.admin-route .client-tools #clientSearch {
+  flex: 1 1 320px;
+  width: auto;
+}
+
+body.admin-route .client-tools > .zsel,
+body.admin-route .client-tools > select {
+  flex: 0 1 260px;
+  width: auto;
 }
 
 body.admin-route .admin-list-head {
