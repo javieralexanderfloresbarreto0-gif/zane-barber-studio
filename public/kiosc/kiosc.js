@@ -236,7 +236,7 @@
       '<label>Teléfono (WhatsApp)<input name="phone" type="tel" inputmode="numeric" maxlength="20" ' +
       'placeholder="0412 000 0000" required></label>' +
       '<div class="k-actions">' +
-      '<button type="button" id="back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Atrás</button>' +
+      '<button type="button" id="back" aria-label="Atrás"><i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="k-label">Atrás</span></button>' +
       '<button type="submit" class="k-primary">Continuar al pago <i class="fas fa-arrow-right" aria-hidden="true"></i></button>' +
       '</div></form></div>';
     document.getElementById('back').onclick = function () { state.pick = null; go('menu'); };
