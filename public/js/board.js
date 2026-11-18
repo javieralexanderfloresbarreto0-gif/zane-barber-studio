@@ -560,12 +560,52 @@
       '</tbody></table>';
   }
 
+  var pollTimer = null;
+  function notifyNewPayment(o) {
+    beep();
+    if (window.Notification && Notification.permission === 'granted') {
+      new Notification('Pago por validar', { body: o.client_name + ' · ' + o.service_name + ' · ' + money(o.amount_bs) });
+    }
+  }
+
+  function pollOnce() {
+    if (document.visibilityState === 'hidden' || !token()) return;
+    api('/api/orders').then(function (r) {
+      if (!r.ok) throw r;
+      return r.json();
+    }).then(function (list) {
+      var next = {};
+      list.forEach(function (o) {
+        var before = byId[o.id];
+        if (o.payment_status === 'submitted' && (!before || before.payment_status !== 'submitted')) notifyNewPayment(o);
+        next[o.id] = o;
+      });
+      byId = next;
+      render();
+      setStatus('live', 'En vivo');
+    }).catch(function () {
+      setStatus('error', 'Reconectando…');
+    });
+  }
+
+  function startPolling(interval) {
+    if (pollTimer) return;
+    setStatus('live', 'En vivo');
+    pollTimer = setInterval(pollOnce, interval);
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') pollOnce();
+    });
+  }
+
   function connectStream() {
-    if (es || !token()) return;
+    if (es || pollTimer || !token()) return;
     api('/api/stream-token', { method: 'POST' }).then(function (r) {
       if (!r.ok) throw r;
       return r.json();
     }).then(function (d) {
+      // En Cloudflare no hay conexión abierta (SSE): el servidor pide consultar
+      // cada pocos segundos y el tablero detecta los pagos nuevos comparando.
+      if (d.poll) { startPolling(d.interval || 5000); return; }
       es = new EventSource('/api/stream?token=' + encodeURIComponent(d.token));
 
       // al (re)conectar, resincroniza por si se perdieron eventos; loadBoard()

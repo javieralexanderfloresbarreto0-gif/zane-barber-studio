@@ -60,6 +60,27 @@ Las respuestas se sirven con `compression` (gzip/brotli) y los estáticos con
 semana.
 
 
+
+## Publicar en Cloudflare (sin depender de una PC encendida)
+
+La carpeta `cloudflare/` tiene una versión del backend para **Cloudflare Workers + D1**
+con las mismas rutas que `server/`. La web, el panel y el kiosco (`public/`) son los mismos.
+
+```bash
+bash cloudflare/desplegar.sh            # primera vez: login, base de datos, datos y contraseña
+bash cloudflare/desplegar.sh            # después: publica los cambios
+bash cloudflare/desplegar.sh --importar # volver a copiar los datos de esta PC (reemplaza los de la nube)
+```
+
+Diferencias con el servidor Node:
+- Hora de Venezuela fija (UTC-4) en SQL y JS, porque los Workers corren en UTC.
+- El tablero de Turnos consulta cada 5 s en lugar de usar SSE (`/api/stream-token` responde `{ poll: true }`).
+- Las fotos de comprobante no se guardan (el kiosco actual no las envía).
+- Tareas periódicas por cron cada 30 min: tasa USDT, órdenes vencidas y limpieza.
+
+Para probarla en local: `cd cloudflare && npx wrangler d1 execute zane-db --local --file=schema.sql && npx wrangler dev`
+(con `cloudflare/.dev.vars` definiendo `ADMIN_PASSWORD` y `TOKEN_SECRET`).
+
 ## Usar el kiosco desde una tablet (red local)
 
 Por seguridad el servidor solo acepta conexiones de la propia computadora. Para
