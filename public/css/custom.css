@@ -2050,7 +2050,9 @@ header[id] {
   gap: 0.4rem;
 }
 
-.client-actions button {
+.client-actions button,
+.client-actions > a {
+  text-decoration: none;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -2064,7 +2066,8 @@ header[id] {
   transition: all var(--transition-fast);
 }
 
-.client-actions button:hover {
+.client-actions button:hover,
+.client-actions > a:hover {
   border-color: var(--zane-gold);
   color: var(--zane-gold);
 }

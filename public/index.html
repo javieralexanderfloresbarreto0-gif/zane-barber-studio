@@ -143,13 +143,14 @@
               </select>
               <label for="bookingDate">Fecha preferida</label>
               <input id="bookingDate" name="date" type="date" required>
-              <label for="bookingTime">Hora tentativa</label>
-              <select id="bookingTime" name="time" required>
-                <option value="">Elige una hora</option>
-                <option>9:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
-                <option>12:00 PM</option><option>2:00 PM</option><option>3:00 PM</option>
-                <option>4:00 PM</option><option>5:00 PM</option><option>6:00 PM</option>
+              <label for="bookingTime">Hora disponible</label>
+              <select id="bookingTime" name="time" required disabled>
+                <option value="">Elige primero una fecha</option>
               </select>
+              <label for="bookingName">Tu nombre</label>
+              <input id="bookingName" name="name" type="text" autocomplete="name" maxlength="120" required placeholder="Nombre y apellido">
+              <label for="bookingPhone">Tu WhatsApp</label>
+              <input id="bookingPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required placeholder="0412 1234567">
             </div>
             <div class="booking-summary" aria-live="polite">
               <span>Detalle de tu cita</span>
@@ -159,7 +160,7 @@
           </div>
           <div class="modal-footer">
             <button type="submit" class="btn btn-zane w-100">
-              <i class="fab fa-whatsapp me-2"></i>Confirmar por WhatsApp
+              <i class="fas fa-calendar-check me-2"></i>Reservar mi cita
             </button>
           </div>
         </form>
@@ -580,6 +581,10 @@
             <span><i class="fas fa-users me-1"></i> Clientes</span>
             <span class="tab-count" id="tabCountClients">0</span>
           </button>
+          <button type="button" class="admin-tab" data-panel-tab="agenda" role="tab">
+            <span><i class="fas fa-calendar-alt me-1"></i> Agenda</span>
+            <span class="tab-count" id="tabCountAgenda">0</span>
+          </button>
           <button type="button" class="admin-tab" data-panel-tab="turnos" role="tab">
             <span><i class="fas fa-list-ol me-1"></i> Turnos</span>
             <span class="tab-count" id="tabCountTurnos">0</span>
@@ -672,6 +677,12 @@
             <span id="clientCount" class="badge bg-gold text-dark">0</span>
           </div>
           <div class="client-list" id="clientList"></div>
+        </div>
+
+        <!-- AGENDA (citas reservadas desde la web) -->
+        <div data-panel-view="agenda" hidden>
+          <div class="admin-list-head"><h3>Citas reservadas</h3></div>
+          <div class="client-list" id="agendaList"></div>
         </div>
 
         <!-- ESTILOS -->

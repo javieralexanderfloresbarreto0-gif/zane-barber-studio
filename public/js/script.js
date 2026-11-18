@@ -74,6 +74,54 @@
     ? bootstrap.Modal.getOrCreateInstance(bookingModalElement)
     : null;
 
+  var bookingName = document.getElementById('bookingName');
+  var bookingPhone = document.getElementById('bookingPhone');
+  var bookingSubmit = bookingForm ? bookingForm.querySelector('[type="submit"]') : null;
+  var availabilityToken = 0;
+
+  function setBookingError(message) {
+    if (bookingError) bookingError.textContent = message || '';
+  }
+
+  function resetTimeSelect(message) {
+    bookingTime.innerHTML = '';
+    var option = document.createElement('option');
+    option.value = '';
+    option.textContent = message;
+    bookingTime.appendChild(option);
+    bookingTime.disabled = true;
+  }
+
+  function loadAvailability() {
+    if (!bookingDate.value) { resetTimeSelect('Elige primero una fecha'); return Promise.resolve(); }
+    var token = ++availabilityToken;
+    resetTimeSelect('Cargando horas…');
+    return fetch('/api/availability?date=' + encodeURIComponent(bookingDate.value)).then(function (res) {
+      if (!res.ok) throw new Error('availability');
+      return res.json();
+    }).then(function (data) {
+      if (token !== availabilityToken) return;
+      var free = data.slots.filter(function (slot) { return slot.free; });
+      if (!data.open) return resetTimeSelect('Sin atención ese día · elige otra fecha');
+      if (!free.length) return resetTimeSelect('Día completo · elige otra fecha');
+      resetTimeSelect('Elige una hora');
+      free.forEach(function (slot) {
+        var option = document.createElement('option');
+        option.value = slot.time;
+        option.textContent = slot.label;
+        bookingTime.appendChild(option);
+      });
+      bookingTime.disabled = false;
+    }).catch(function () {
+      if (token === availabilityToken) resetTimeSelect('No se pudo cargar · reintenta');
+    });
+  }
+
+  function selectedTimeLabel() {
+    var option = bookingTime.options[bookingTime.selectedIndex];
+    return option ? option.textContent : '';
+  }
+
   function updateBookingSummary() {
     if (!bookingService || !bookingDate || !bookingTime || !bookingSummary) return;
     var serviceOption = bookingService.options[bookingService.selectedIndex];
@@ -87,16 +135,21 @@
     var bs = bolivaresFromRef(serviceOption.dataset.ref);
     var fallbackBs = Number(serviceOption.dataset.bs) || 0;
     var priceText = bs !== null ? formatBs(bs) : (fallbackBs ? formatBs(fallbackBs) : 'Consultar');
-    bookingSummary.textContent = serviceOption.value + ' · ' + priceText + ' · ' + readableDate + ' · ' + bookingTime.value;
+    bookingSummary.textContent = serviceOption.value + ' · ' + priceText + ' · ' + readableDate + ' · ' + selectedTimeLabel();
+  }
+
+  function resetBookingForm() {
+    bookingForm.reset();
+    bookingForm.classList.remove('was-validated');
+    setBookingError('');
+    resetTimeSelect('Elige primero una fecha');
   }
 
   if (bookingForm && bookingModal) {
     document.querySelectorAll('[data-booking-open]').forEach(function (trigger) {
       trigger.addEventListener('click', function (event) {
         event.preventDefault();
-        bookingForm.reset();
-        bookingForm.classList.remove('was-validated');
-        if (bookingError) bookingError.textContent = '';
+        resetBookingForm();
         if (trigger.dataset.bookingService) bookingService.value = trigger.dataset.bookingService;
         updateBookingSummary();
         bookingModal.show();
@@ -104,22 +157,23 @@
     });
 
     bookingModalElement.addEventListener('hidden.bs.modal', function () {
-      bookingForm.reset();
-      bookingForm.classList.remove('was-validated');
-      if (bookingError) bookingError.textContent = '';
+      resetBookingForm();
       updateBookingSummary();
     });
 
     bookingDate.min = localISODate();
-    [bookingService, bookingDate, bookingTime].forEach(function (field) {
+    bookingDate.addEventListener('change', function () {
+      loadAvailability().then(updateBookingSummary);
+    });
+    [bookingService, bookingTime].forEach(function (field) {
       field.addEventListener('change', updateBookingSummary);
     });
 
     bookingForm.addEventListener('submit', function (event) {
       event.preventDefault();
-      if (bookingError) bookingError.textContent = '';
+      setBookingError('');
       if (!bookingForm.checkValidity()) {
-        if (bookingError) bookingError.textContent = 'Elige un servicio, una fecha y una hora para continuar.';
+        setBookingError('Completa servicio, fecha, hora, nombre y WhatsApp para continuar.');
         bookingForm.classList.add('was-validated');
         return;
       }
@@ -127,9 +181,35 @@
       var bsAmount = bolivaresFromRef(serviceOption.dataset.ref);
       var fallbackBs = Number(serviceOption.dataset.bs) || 0;
       var priceStr = bsAmount !== null ? formatBs(bsAmount) : (fallbackBs ? formatBs(fallbackBs) : 'Consultar');
-      var message = 'Hola, quiero reservar en Zane Barber Studio.%0A%0AServicio: ' + encodeURIComponent(serviceOption.value) + '%0APrecio: ' + encodeURIComponent(priceStr) + '%0AFecha: ' + encodeURIComponent(bookingDate.value) + '%0AHora: ' + encodeURIComponent(bookingTime.value);
-      window.open('https://wa.me/584121453691?text=' + message, '_blank', 'noopener');
-      bookingModal.hide();
+      var timeLabel = selectedTimeLabel();
+      if (bookingSubmit) bookingSubmit.disabled = true;
+      fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: bookingName.value, phone: bookingPhone.value, service: bookingService.value,
+          date: bookingDate.value, time: bookingTime.value
+        })
+      }).then(function (res) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok) {
+            var failure = new Error(data.error || 'No se pudo reservar. Intenta de nuevo.');
+            failure.conflict = res.status === 409;
+            throw failure;
+          }
+          return data;
+        });
+      }).then(function () {
+        var message = 'Hola, soy ' + bookingName.value.trim() + '. Reservé en Zane Barber Studio.\n\nServicio: ' + bookingService.value +
+          '\nPrecio: ' + priceStr + '\nFecha: ' + bookingDate.value + '\nHora: ' + timeLabel;
+        window.open('https://wa.me/584121453691?text=' + encodeURIComponent(message), '_blank', 'noopener');
+        bookingModal.hide();
+      }).catch(function (error) {
+        setBookingError(error.message || 'No se pudo reservar. Intenta de nuevo.');
+        if (error.conflict) loadAvailability();
+      }).then(function () {
+        if (bookingSubmit) bookingSubmit.disabled = false;
+      });
     });
   }
 
@@ -731,6 +811,7 @@
     loadCash();
     loadRate();
     loadBirthdays();
+    loadAgenda();
   }
 
   function loadClients() {
@@ -788,6 +869,56 @@
       if (cashNotes) cashNotes.value = data.notes || '';
     }).catch(function () {
       showFeedback(cashFeedback, 'Error al cargar caja.');
+    });
+  }
+
+  var agendaList = document.getElementById('agendaList');
+  var tabCountAgenda = document.getElementById('tabCountAgenda');
+
+  function loadAgenda() {
+    if (!agendaList) return;
+    apiFetch('/api/appointments').then(function (res) {
+      if (!res.ok) throw res;
+      return res.json();
+    }).then(function (rows) {
+      var today = localISODate();
+      var upcoming = rows.filter(function (row) { return row.appt_date >= today && row.status === 'booked'; });
+      if (tabCountAgenda) {
+        tabCountAgenda.textContent = upcoming.length;
+        tabCountAgenda.classList.toggle('has-urgent', upcoming.length > 0);
+      }
+      if (!rows.length) {
+        agendaList.innerHTML = '<p class="admin-empty">No hay citas reservadas.</p>';
+        return;
+      }
+      agendaList.innerHTML = rows.map(function (row) {
+        var day = new Date(row.appt_date + 'T12:00:00').toLocaleDateString('es-VE', { weekday: 'short', day: 'numeric', month: 'short' });
+        var statusText = { booked: '', done: ' · Atendida', no_show: ' · No asistió' }[row.status] || '';
+        var actions = row.status === 'booked'
+          ? '<button type="button" data-appt-action="done" data-appt-id="' + row.id + '" aria-label="Marcar atendida"><i class="fas fa-check"></i></button>' +
+            '<button type="button" data-appt-action="no_show" data-appt-id="' + row.id + '" aria-label="No asistió"><i class="fas fa-user-slash"></i></button>' +
+            '<button type="button" data-appt-action="cancelled" data-appt-id="' + row.id + '" aria-label="Cancelar cita"><i class="fas fa-times"></i></button>'
+          : '';
+        return '<article class="client-item">' +
+          '<div><h4>' + escapeHTML(day) + ' · ' + escapeHTML(row.label) + ' — ' + escapeHTML(row.client_name) + '</h4>' +
+          '<p>' + escapeHTML(row.service) + ' · ' + escapeHTML(row.client_phone) + escapeHTML(statusText) + '</p></div>' +
+          '<div class="client-actions">' +
+            '<a href="https://wa.me/' + encodeURIComponent(row.client_phone) + '" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>' +
+            actions +
+          '</div></article>';
+      }).join('');
+    }).catch(function () {
+      agendaList.innerHTML = '<p class="admin-empty">Error al cargar la agenda.</p>';
+    });
+  }
+
+  if (agendaList) {
+    agendaList.addEventListener('click', function (event) {
+      var button = event.target.closest('[data-appt-action]');
+      if (!button) return;
+      apiFetch('/api/appointments/' + encodeURIComponent(button.dataset.apptId) + '/status', {
+        method: 'PUT', body: JSON.stringify({ status: button.dataset.apptAction })
+      }).then(loadAgenda);
     });
   }
 
@@ -1137,6 +1268,7 @@
       if (target === 'styles') loadStyles();
       if (target === 'cash') { loadCash(); loadRate(); }
       if (target === 'birthdays') loadBirthdays();
+      if (target === 'agenda') loadAgenda();
     });
   });
 
