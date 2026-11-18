@@ -415,6 +415,25 @@ const WEEKDAY_SLOTS = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16
 const SATURDAY_SLOTS = WEEKDAY_SLOTS.concat('19:00');
 const BOOKING_WINDOW_DAYS = 60;
 const bookingAttempts = new Map();
+const BOOKING_LIMIT_PER_HOUR = 6;
+
+function isLoopbackIp(ip) {
+  return !ip || ip === '::1' || ip.startsWith('127.') || ip.startsWith('::ffff:127.');
+}
+
+function recentBookings(key, now) {
+  return (bookingAttempts.get(key) || []).filter((stamp) => now - stamp < 60 * 60 * 1000);
+}
+
+function tooManyBookings(key, now) {
+  return recentBookings(key, now).length >= BOOKING_LIMIT_PER_HOUR;
+}
+
+function recordBooking(key, now) {
+  const recent = recentBookings(key, now);
+  recent.push(now);
+  bookingAttempts.set(key, recent);
+}
 
 function slotLabel(time) {
   const hour = Number(time.slice(0, 2));
@@ -461,13 +480,6 @@ app.get('/api/availability', (request, response) => {
 app.post('/api/appointments', (request, response) => {
   const ip = request.ip || 'unknown';
   const now = Date.now();
-  const recent = (bookingAttempts.get(ip) || []).filter((stamp) => now - stamp < 60 * 60 * 1000);
-  if (recent.length >= 6) {
-    return response.status(429).json({ error: 'Demasiadas solicitudes. Escríbenos por WhatsApp.' });
-  }
-  recent.push(now);
-  bookingAttempts.set(ip, recent);
-
   const body = request.body || {};
   const name = String(body.name || '').trim().slice(0, 120);
   const phone = normalizePhone(body.phone).slice(0, 20);
@@ -476,6 +488,15 @@ app.post('/api/appointments', (request, response) => {
   const time = String(body.time || '');
   if (!name || !service) return response.status(400).json({ error: 'Faltan datos de la reserva.' });
   if (phone.length < 10) return response.status(400).json({ error: 'El teléfono no es válido.' });
+  // Límite por teléfono y, si se conoce, por IP. Detrás de un túnel sin cabecera
+  // X-Forwarded-For todos llegarían como 127.0.0.1: limitar por esa IP bloquearía
+  // las reservas de todo el mundo, así que en ese caso solo cuenta el teléfono.
+  const limitKeys = [`phone:${phone}`];
+  if (!isLoopbackIp(ip)) limitKeys.push(`ip:${ip}`);
+  if (limitKeys.some((key) => tooManyBookings(key, now))) {
+    return response.status(429).json({ error: 'Demasiadas solicitudes. Escríbenos por WhatsApp.' });
+  }
+  limitKeys.forEach((key) => recordBooking(key, now));
   const offered = slotsForDate(date);
   if (!offered || !offered.includes(time)) {
     return response.status(400).json({ error: 'Esa fecha u hora no está disponible.' });
@@ -517,10 +538,18 @@ app.put('/api/appointments/:id/status', requireAuth, (request, response) => {
 });
 
 // Direcciones de esta computadora en la red local, para registrar tablets.
+// Ignora las interfaces virtuales (máquinas virtuales, Docker, VPN, Tailscale) y
+// pone primero la típica del router de casa (192.168.x.x).
 function lanUrls() {
-  return Object.values(os.networkInterfaces()).flat()
-    .filter((net) => net && net.family === 'IPv4' && !net.internal)
-    .map((net) => `http://${net.address}:${port}`);
+  const virtual = /^(virbr|docker|br-|veth|tailscale|tun|tap|wg|zt|lo)/i;
+  const rank = (address) => (address.startsWith('192.168.') ? 0 : address.startsWith('10.') ? 1 : 2);
+  return Object.entries(os.networkInterfaces())
+    .filter(([name]) => !virtual.test(name))
+    .flatMap(([, nets]) => nets || [])
+    .filter((net) => net.family === 'IPv4' && !net.internal && !net.address.startsWith('169.254.'))
+    .map((net) => net.address)
+    .sort((a, b) => rank(a) - rank(b))
+    .map((address) => `http://${address}:${port}`);
 }
 
 // Solo tiene sentido si el servidor escucha en la red (HOST=0.0.0.0).
