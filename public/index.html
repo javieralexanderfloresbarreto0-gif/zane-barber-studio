@@ -185,15 +185,6 @@
             Corte, barba y color con tiempo y criterio. Atendemos con cita
             en El Sisal, Guacara.
           </p>
-          <div class="power-banner" role="note">
-            <div class="power-banner-icon">
-              <i class="fas fa-bolt" aria-hidden="true"></i>
-            </div>
-            <div class="power-banner-content">
-              <strong>Planta eléctrica propia</strong>
-              <small>Si se va la luz, seguimos trabajando y tu cita no se cancela.</small>
-            </div>
-          </div>
           <div class="hero-cta-group">
             <a href="#reserva" data-booking-open class="btn btn-lg rounded-pill px-4 hero-cta hero-cta--primary">
               <i class="fab fa-whatsapp me-2"></i>Agendar cita
@@ -218,6 +209,31 @@
       </div>
     </div>
   </header>
+
+
+  <!-- ==================== VENTAJAS ==================== -->
+  <section class="perks" aria-label="Por qué elegirnos">
+    <div class="container">
+      <ul class="perks-list">
+        <li class="perk">
+          <span class="perk-icon"><i class="fas fa-bolt" aria-hidden="true"></i></span>
+          <div><strong>Planta eléctrica</strong><small>Si se va la luz, seguimos atendiendo.</small></div>
+        </li>
+        <li class="perk">
+          <span class="perk-icon"><i class="fas fa-mug-hot" aria-hidden="true"></i></span>
+          <div><strong>Café de cortesía</strong><small>Mientras esperas tu turno.</small></div>
+        </li>
+        <li class="perk">
+          <span class="perk-icon"><i class="fas fa-calendar-check" aria-hidden="true"></i></span>
+          <div><strong>Atención con cita</strong><small>Reserva tu hora y no esperes.</small></div>
+        </li>
+        <li class="perk">
+          <span class="perk-icon"><i class="fas fa-mobile-screen-button" aria-hidden="true"></i></span>
+          <div><strong>Pago Móvil</strong><small>También efectivo y transferencia.</small></div>
+        </li>
+      </ul>
+    </div>
+  </section>
 
   <!-- ==================== SERVICIOS ==================== -->
   <section id="servicios" class="services-section" data-section>
@@ -329,7 +345,7 @@
         </figure>
 
         <figure class="gallery-item" data-category="barba" tabindex="0">
-          <img src="img/galeria/ritual-barba.png" alt="Perfilado y ritual de barba en Zane Barber Studio" loading="lazy" decoding="async" width="1920" height="2560">
+          <img src="img/galeria/ritual-barba.jpg" alt="Perfilado y ritual de barba en Zane Barber Studio" loading="lazy" decoding="async" width="1080" height="1440">
           <figcaption>Barba a navaja</figcaption>
         </figure>
 
@@ -428,16 +444,18 @@
             <h2 class="section-title">Horario de atención</h2>
           </div>
 
+          <p class="open-status" id="openStatus" hidden></p>
+
           <div class="hours-card mt-4">
-            <div class="hours-row">
+            <div class="hours-row" data-days="1,2,3,4,5" data-open="9" data-close="19">
               <span class="hours-day"><i class="fas fa-calendar-day text-gold me-2"></i> Lunes a Viernes</span>
               <span class="hours-value">9:00 AM – 7:00 PM</span>
             </div>
-            <div class="hours-row">
+            <div class="hours-row" data-days="6" data-open="9" data-close="20">
               <span class="hours-day"><i class="fas fa-calendar-day text-gold me-2"></i> Sábados</span>
               <span class="hours-value">9:00 AM – 8:00 PM</span>
             </div>
-            <div class="hours-row hours-row--closed">
+            <div class="hours-row hours-row--closed" data-days="0">
               <span class="hours-day"><i class="fas fa-moon me-2"></i> Domingos</span>
               <span class="hours-value badge-closed">Cerrado</span>
             </div>

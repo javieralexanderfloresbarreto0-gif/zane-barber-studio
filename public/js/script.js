@@ -1277,5 +1277,79 @@
 
   loadRate();
 
+  // ---- Horario: resalta el día de hoy y dice si está abierto ahora ----
+  // Se calcula con la hora de Venezuela, aunque el visitante esté en otra zona.
+  (function setupOpenStatus() {
+    var statusEl = document.getElementById('openStatus');
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.hours-row[data-days]'));
+    if (!statusEl || !rows.length) return;
+    function hourLabel(hour) {
+      return (hour % 12 || 12) + ':00 ' + (hour < 12 ? 'AM' : 'PM');
+    }
+    function caracasNow() {
+      var parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Caracas', weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false
+      }).formatToParts(new Date());
+      var get = function (type) { return (parts.find(function (p) { return p.type === type; }) || {}).value; };
+      var days = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      return { day: days[get('weekday')], hour: Number(get('hour')) % 24, minute: Number(get('minute')) };
+    }
+    function rowFor(day) {
+      return rows.find(function (row) { return row.dataset.days.split(',').indexOf(String(day)) > -1; });
+    }
+    function update() {
+      var now = caracasNow();
+      rows.forEach(function (row) { row.classList.remove('is-today'); });
+      var today = rowFor(now.day);
+      if (today) today.classList.add('is-today');
+      var minutes = now.hour * 60 + now.minute;
+      var open = today && today.dataset.open ? Number(today.dataset.open) : null;
+      var close = today && today.dataset.close ? Number(today.dataset.close) : null;
+      var text;
+      var isOpen = open !== null && minutes >= open * 60 && minutes < close * 60;
+      if (isOpen) {
+        text = 'Abierto ahora · cierra a las ' + hourLabel(close);
+      } else if (open !== null && minutes < open * 60) {
+        text = 'Cerrado ahora · abre hoy a las ' + hourLabel(open);
+      } else {
+        var next = null;
+        for (var i = 1; i <= 7 && !next; i++) {
+          var row = rowFor((now.day + i) % 7);
+          if (row && row.dataset.open) next = { offset: i, open: Number(row.dataset.open) };
+        }
+        var when = next && next.offset === 1 ? 'mañana' : 'el lunes';
+        text = 'Cerrado ahora · abre ' + when + (next ? ' a las ' + hourLabel(next.open) : '');
+      }
+      statusEl.innerHTML = '<span class="open-dot" aria-hidden="true"></span>' + escapeHTML(text);
+      statusEl.classList.toggle('is-open', !!isOpen);
+      statusEl.hidden = false;
+    }
+    update();
+    setInterval(update, 60000);
+  })();
+
+  // ---- Aparición suave de las secciones al hacer scroll ----
+  (function setupReveal() {
+    if (isAdminRoute || !('IntersectionObserver' in window)) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var targets = document.querySelectorAll(
+      '.perk, .services-head, .service-row, .section-head, .gallery-filters, .gallery-grid, ' +
+      '.faq-section .accordion-item, .hours-card, .open-status, .hours-cta, .contact-shell'
+    );
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    Array.prototype.forEach.call(targets, function (el) {
+      var siblings = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
+      el.style.setProperty('--reveal-delay', Math.min(siblings, 5) * 70 + 'ms');
+      el.classList.add('reveal');
+      observer.observe(el);
+    });
+  })();
+
   if (isAdminRoute && authToken) enterDashboard();
 })();
