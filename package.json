@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
+    "start:tablet": "HOST=0.0.0.0 node server/index.js",
     "check": "node --check server/index.js && node --check server/kiosc/mount.js && node --check public/js/script.js && node --check public/js/board.js && node --check public/kiosc/kiosc.js && node --check public/kiosc/sw.js"
   },
   "engines": {

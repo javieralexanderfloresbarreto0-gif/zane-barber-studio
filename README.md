@@ -59,6 +59,21 @@ Las respuestas se sirven con `compression` (gzip/brotli) y los estáticos con
 `Cache-Control`: `vendor/` de forma agresiva (filename estable) e `img/` una
 semana.
 
+
+## Usar el kiosco desde una tablet (red local)
+
+Por seguridad el servidor solo acepta conexiones de la propia computadora. Para
+que una tablet conectada al mismo Wi-Fi pueda entrar, enciéndelo así:
+
+```bash
+npm run start:tablet
+```
+
+La consola muestra la dirección para la tablet (`http://192.168.x.x:3000/kiosc/`).
+Luego, en el panel (`/?admin=1`) → **Turnos** → **Tablets** → **Registrar tablet**,
+escanea el código QR con la tablet. Si la tablet no carga, revisa que esté en el
+mismo Wi-Fi y que el firewall permita el puerto 3000 (`sudo ufw allow 3000/tcp`).
+
 ## Despliegue
 
 Para ponerlo en producción gratis (Oracle Cloud Always Free), ver

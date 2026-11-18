@@ -158,19 +158,7 @@
       api('/api/kiosc/devices', { method: 'POST', body: JSON.stringify({ label: label }) })
         .then(function (r) { return r.json(); })
         .then(function (d) {
-          var link = location.origin + '/kiosc/?enroll=' + d.token;
-          devEnroll.hidden = false;
-          devEnroll.innerHTML =
-            '<p><strong>' + esc(d.label) + '</strong> — abre este enlace <em>una sola vez</em> en la tablet:</p>' +
-            '<code>' + esc(link) + '</code>' +
-            '<div class="device-enroll-actions">' +
-            '<button type="button" id="devCopy">Copiar enlace</button>' +
-            '<button type="button" id="devHide">Cerrar</button></div>';
-          document.getElementById('devCopy').onclick = function () {
-            if (navigator.clipboard) navigator.clipboard.writeText(link);
-            this.textContent = 'Copiado ✓';
-          };
-          document.getElementById('devHide').onclick = function () { devEnroll.hidden = true; };
+          showEnrollLink(d);
           loadDevices();
         })
         .catch(function () {
@@ -181,6 +169,47 @@
         });
     });
   });
+
+  // En la computadora el panel se abre como localhost, pero la tablet necesita
+  // la IP de la red local. Se pide al servidor y se muestra con un QR para escanear.
+  function showEnrollLink(d) {
+    var local = /^(localhost|127\.|\[::1\])/.test(location.hostname);
+    var lan = local
+      ? api('/api/lan-urls').then(function (r) { return r.ok ? r.json() : { exposed: false, urls: [] }; })
+          .catch(function () { return { exposed: false, urls: [] }; })
+      : Promise.resolve({ exposed: true, urls: [location.origin] });
+    lan.then(function (info) {
+      var base = info.urls[0] || location.origin;
+      var link = base + '/kiosc/?enroll=' + d.token;
+      var qr = '';
+      if (window.qrcode) {
+        var code = window.qrcode(0, 'M');
+        code.addData(link);
+        code.make();
+        qr = '<div class="device-enroll-qr">' + code.createSvgTag({ cellSize: 5, margin: 2, scalable: true }) + '</div>';
+      }
+      var warn = local && !info.exposed
+        ? '<p class="device-enroll-warn">El servidor solo acepta conexiones de esta computadora. ' +
+          'Apágalo y vuelve a encenderlo con <code>npm run start:tablet</code> para que la tablet pueda entrar.</p>'
+        : '';
+      var others = info.urls.length > 1
+        ? '<p class="device-enroll-alt">Si no abre, prueba con: ' + info.urls.slice(1).map(function (u) { return esc(u) + '/kiosc/'; }).join(' · ') + '</p>'
+        : '';
+      devEnroll.hidden = false;
+      devEnroll.innerHTML =
+        '<p><strong>' + esc(d.label) + '</strong> — escanea el código con la tablet (misma red Wi-Fi) o abre este enlace <em>una sola vez</em>:</p>' +
+        warn + qr +
+        '<code>' + esc(link) + '</code>' + others +
+        '<div class="device-enroll-actions">' +
+        '<button type="button" id="devCopy">Copiar enlace</button>' +
+        '<button type="button" id="devHide">Cerrar</button></div>';
+      document.getElementById('devCopy').onclick = function () {
+        if (navigator.clipboard) navigator.clipboard.writeText(link);
+        this.textContent = 'Copiado ✓';
+      };
+      document.getElementById('devHide').onclick = function () { devEnroll.hidden = true; };
+    });
+  }
 
   if (devList) devList.addEventListener('click', function (e) {
     var b = e.target.closest('[data-revoke]');
@@ -658,6 +687,10 @@
       '.device-enroll code{display:block;word-break:break-all;font-size:12.5px;margin:8px 0 12px;',
       'padding:8px 10px;background:rgba(0,0,0,.25);border-radius:8px}',
       '.device-enroll-actions{display:flex;gap:8px}',
+      '.device-enroll-qr{background:#fff;border-radius:10px;padding:8px;width:220px;max-width:100%;margin:6px 0 10px}',
+      '.device-enroll-qr svg{display:block;width:100%;height:auto}',
+      '.device-enroll-warn{color:#F0B48A;font-size:13px;margin:6px 0}',
+      '.device-enroll-alt{font-size:12.5px;opacity:.8;margin:0 0 10px}',
       '.device-enroll-actions button{font:600 13px/1 inherit;padding:9px 14px;border-radius:8px;',
       'border:1px solid var(--zane-border,rgba(255,255,255,.14));background:var(--azul-brand,#1C1C1E);color:#fff;cursor:pointer}',
       // --- resumen del día (KPIs) ---
