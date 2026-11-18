@@ -288,3 +288,99 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 /* #app es el "escenario" de cada paso: kiosc.js anima su entrada/salida
    (opacity + transform, ambas compositor-friendly) al cambiar de pantalla. */
 #app{ will-change:opacity, transform }
+
+/* ====================================================================
+   TELÉFONO (≤ 600px): el kiosco también se usa en un móvil.
+   Tarjetas compactas en fila, resumen en línea y botón de pago fijo abajo.
+   ==================================================================== */
+@media (max-width:600px){
+  html,body{font-size:16px}
+
+  .k-top{grid-template-columns:auto 1fr; gap:10px; padding:10px 14px}
+  .k-brand img{width:36px; height:36px; border-radius:10px}
+  .k-brand span, .k-clock{display:none}
+  .k-steps{justify-self:end; padding:4px; gap:4px}
+  .k-steps li{padding:4px}
+  .k-steps b{width:24px; height:24px; font-size:.75rem}
+  .k-steps li.is-current span{display:inline; padding-right:6px; font-size:.8rem}
+
+  #app{padding:18px 14px calc(28px + env(safe-area-inset-bottom))}
+  .k-head{margin-bottom:16px}
+  .k-eyebrow{font-size:.68rem; letter-spacing:.12em; margin-bottom:6px}
+  .k-title{font-size:2.3rem}
+  .k-sub{font-size:.95rem; margin-top:8px}
+
+  /* Menú: tarjeta horizontal compacta (icono · texto · precio) */
+  .k-grid{grid-template-columns:1fr; gap:10px}
+  .k-card{
+    display:grid; grid-template-columns:44px minmax(0,1fr); grid-template-areas:
+      "icon name"
+      "icon desc"
+      "icon foot";
+    column-gap:12px; row-gap:2px; align-items:start;
+    min-height:0; padding:14px 14px 14px 12px; border-radius:18px;
+  }
+  .k-card-icon{grid-area:icon; width:44px; height:44px; border-radius:13px; font-size:1.05rem; margin:0}
+  .k-card-name{grid-area:name; font-size:1.3rem; line-height:1.05}
+  .k-card-desc{grid-area:desc; font-size:.82rem; line-height:1.35;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+  .k-card-foot{grid-area:foot; display:flex; align-items:center; gap:8px; margin-top:8px; padding-top:0; border-top:0}
+  .k-card-price{font-size:1.45rem}
+  .k-chip{padding:4px 9px; font-size:.74rem}
+  .k-card-go{margin-left:auto; width:38px; height:38px; font-size:.9rem}
+
+  /* Datos: resumen en una sola fila arriba del formulario */
+  .k-split{gap:12px}
+  .k-pick{display:grid; grid-template-columns:44px minmax(0,1fr) auto; grid-template-areas:
+      "icon label price"
+      "icon name  price";
+    column-gap:12px; row-gap:0; align-items:center; padding:12px 14px; border-radius:18px}
+  .k-pick .k-card-icon{grid-area:icon; width:44px; height:44px; border-radius:13px; font-size:1.05rem; margin:0}
+  .k-pick-label{grid-area:label; font-size:.65rem}
+  .k-pick-name{grid-area:name; font-size:1.15rem; line-height:1.05}
+  .k-pick-price{grid-area:price; font-size:1.5rem; text-align:right}
+  .k-pick .k-chip{display:none}
+  .k-form{padding:16px; gap:14px; border-radius:18px}
+  .k-form label{font-size:.9rem; gap:8px}
+  .k-form input[type=text], .k-form input[type=tel], .k-form input:not([type]){
+    font-size:1.15rem; min-height:56px; padding:14px 16px; border-radius:14px}
+  .k-actions{gap:8px}
+  .k-actions button, .k-primary{min-height:58px; padding:14px 16px; font-size:1.08rem; border-radius:15px}
+  .k-actions button:not(.k-primary){flex:0 0 auto; width:58px; padding:0}
+  .k-actions button:not(.k-primary) .k-label{display:none}
+  .k-actions .k-primary{min-width:0}
+
+  /* Pago: monto compacto, QR más chico y botón fijo al pie de la pantalla */
+  .k-amount-box{padding:14px 18px; margin-bottom:14px; border-radius:18px}
+  .k-amount-box span{font-size:.75rem}
+  .k-amount-box b{font-size:2.3rem}
+  .k-methods{gap:12px}
+  .k-method{padding:14px; gap:10px; border-radius:18px}
+  .k-method-name{font-size:1.1rem}
+  .k-qr{max-width:210px; padding:8px; border-radius:12px}
+  .k-pm{grid-template-columns:1fr 1fr; gap:8px}
+  .k-pm > div{padding:9px 11px; border-radius:12px}
+  .k-pm b{font-size:1.1rem}
+  .k-pm span{font-size:.66rem}
+  #app:has(.k-paybar){padding-bottom:0}
+  /* sticky y no fixed: #app lleva transform (animación entre pasos) y un
+     fixed dentro de él quedaría anclado a #app, no a la pantalla */
+  .k-paybar{position:sticky; bottom:0; margin:16px -14px 0; border-radius:20px 20px 0 0;
+    padding:12px 14px calc(12px + env(safe-area-inset-bottom)); gap:8px; border-bottom:0}
+  .k-paybar .k-note{flex-basis:100%; font-size:.8rem}
+  .k-paybar .k-note i{margin-top:2px}
+  .k-paybar .k-primary{flex:1 1 100%; min-width:0; min-height:56px}
+
+  /* Espera */
+  .k-wait{gap:16px; padding:8px 0}
+  .k-ticket{padding:26px 20px 24px; border-radius:24px}
+  .k-wait .k-check{width:72px; height:72px; font-size:2.1rem}
+  .k-wait h1{font-size:1.9rem; margin:4px 0 6px}
+  .k-wait .k-code{font-size:3.6rem}
+  .k-wait p{font-size:1rem}
+  .k-ticket::before,.k-ticket::after{width:22px; height:22px}
+  .k-ticket::before{left:-12px}
+  .k-ticket::after{right:-12px}
+
+  .k-toast{top:70px}
+}
