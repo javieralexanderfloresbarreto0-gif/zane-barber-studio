@@ -197,7 +197,8 @@
         : '';
       devEnroll.hidden = false;
       devEnroll.innerHTML =
-        '<p><strong>' + esc(d.label) + '</strong> — escanea el código con la tablet (misma red Wi-Fi) o abre este enlace <em>una sola vez</em>:</p>' +
+        '<p><strong>' + esc(d.label) + '</strong> — escanea el código con la tablet' + (local ? ' (misma red Wi-Fi)' : '') +
+        ' o abre este enlace <em>una sola vez</em>. No lo compartas: funciona como la llave del kiosco.</p>' +
         warn + qr +
         '<code>' + esc(link) + '</code>' + others +
         '<div class="device-enroll-actions">' +
