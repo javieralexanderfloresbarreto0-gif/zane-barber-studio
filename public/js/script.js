@@ -122,6 +122,13 @@
     return option ? option.textContent : '';
   }
 
+  // Solo la Colorimetría muestra precio; el resto se cotiza al reservar.
+  function bookingPriceText(option) {
+    var bs = bolivaresFromRef(option.dataset.ref);
+    var fallbackBs = Number(option.dataset.bs) || 0;
+    return bs !== null ? formatBs(bs) : (fallbackBs ? formatBs(fallbackBs) : '');
+  }
+
   function updateBookingSummary() {
     if (!bookingService || !bookingDate || !bookingTime || !bookingSummary) return;
     var serviceOption = bookingService.options[bookingService.selectedIndex];
@@ -132,10 +139,8 @@
     var readableDate = new Date(bookingDate.value + 'T12:00:00').toLocaleDateString('es-VE', {
       day: 'numeric', month: 'long', year: 'numeric'
     });
-    var bs = bolivaresFromRef(serviceOption.dataset.ref);
-    var fallbackBs = Number(serviceOption.dataset.bs) || 0;
-    var priceText = bs !== null ? formatBs(bs) : (fallbackBs ? formatBs(fallbackBs) : 'Consultar');
-    bookingSummary.textContent = serviceOption.value + ' · ' + priceText + ' · ' + readableDate + ' · ' + selectedTimeLabel();
+    var priceText = serviceOption.dataset.ref ? bookingPriceText(serviceOption) : '';
+    bookingSummary.textContent = [serviceOption.value, priceText, readableDate, selectedTimeLabel()].filter(Boolean).join(' · ');
   }
 
   function resetBookingForm() {
@@ -178,9 +183,7 @@
         return;
       }
       var serviceOption = bookingService.options[bookingService.selectedIndex];
-      var bsAmount = bolivaresFromRef(serviceOption.dataset.ref);
-      var fallbackBs = Number(serviceOption.dataset.bs) || 0;
-      var priceStr = bsAmount !== null ? formatBs(bsAmount) : (fallbackBs ? formatBs(fallbackBs) : 'Consultar');
+      var priceStr = serviceOption.dataset.ref ? bookingPriceText(serviceOption) : '';
       var timeLabel = selectedTimeLabel();
       if (bookingSubmit) bookingSubmit.disabled = true;
       fetch('/api/appointments', {
@@ -201,7 +204,7 @@
         });
       }).then(function () {
         var message = 'Hola, soy ' + bookingName.value.trim() + '. Reservé en Zane Barber Studio.\n\nServicio: ' + bookingService.value +
-          '\nPrecio: ' + priceStr + '\nFecha: ' + bookingDate.value + '\nHora: ' + timeLabel;
+          (priceStr ? '\nPrecio: ' + priceStr : '') + '\nFecha: ' + bookingDate.value + '\nHora: ' + timeLabel;
         window.open('https://wa.me/584121453691?text=' + encodeURIComponent(message), '_blank', 'noopener');
         bookingModal.hide();
       }).catch(function (error) {

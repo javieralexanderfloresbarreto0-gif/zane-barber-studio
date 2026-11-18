@@ -726,6 +726,10 @@ header[id] {
   position: relative;
 }
 
+.service-row .service-cta {
+  grid-column: 4;
+}
+
 .service-row:hover {
   background: rgba(255, 255, 255, 0.03);
   transform: translateX(4px);
