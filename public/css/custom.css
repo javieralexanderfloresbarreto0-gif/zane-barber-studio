@@ -3206,3 +3206,630 @@ textarea:focus-visible,
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* ==========================================================================
+   PANEL ADMIN COMO APP (/?admin=1)
+   Sin la portada pública: menú lateral en escritorio y barra inferior en
+   teléfono. Todo va bajo body.admin-route para no tocar la landing.
+   ========================================================================== */
+body.admin-route #mainNav,
+body.admin-route .hero-zane,
+body.admin-route #servicios,
+body.admin-route #galeria,
+body.admin-route #preguntas,
+body.admin-route #horarios,
+body.admin-route #contacto,
+body.admin-route .footer-zane,
+body.admin-route #floatingActions {
+  display: none !important;
+}
+
+body.admin-route {
+  background: var(--zane-bg-main);
+  padding-bottom: 0;
+}
+
+body.admin-route .admin-section {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 0;
+  border: 0;
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(33, 58, 99, 0.55), transparent 60%),
+    var(--zane-bg-main);
+}
+
+body.admin-route .admin-section > .container {
+  max-width: 1440px;
+  padding: 0;
+}
+
+/* ---- Acceso ---- */
+body.admin-route .admin-login {
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 2rem 1.25rem;
+}
+
+body.admin-route .admin-login > * {
+  width: 100%;
+  max-width: 400px;
+}
+
+body.admin-route .admin-login .section-title {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+
+body.admin-route .admin-login-form {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+
+body.admin-route .admin-login-form label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--zane-text-muted);
+}
+
+body.admin-route .admin-login-form input {
+  min-height: 52px;
+  border-radius: 12px;
+  background: var(--zane-bg-main);
+  font-size: 1rem;
+}
+
+body.admin-route .admin-login-form .btn {
+  min-height: 52px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+/* ---- Estructura: menú lateral + contenido ---- */
+body.admin-route .admin-dashboard {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  grid-template-columns: 252px minmax(0, 1fr);
+  grid-template-areas:
+    "tabs heading"
+    "tabs toolbar"
+    "tabs content";
+  grid-template-rows: auto auto 1fr;
+  column-gap: 0;
+  row-gap: 0;
+}
+
+body.admin-route .admin-dashboard > :not(.admin-tabs) {
+  padding-left: clamp(1.25rem, 3vw, 2.75rem);
+  padding-right: clamp(1.25rem, 3vw, 2.75rem);
+}
+
+body.admin-route .admin-tabs {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  padding: 1.25rem 0.85rem;
+  gap: 0.2rem;
+  background: rgba(11, 31, 69, 0.55);
+  border-right: 1px solid var(--zane-border);
+  overflow-y: auto;
+}
+
+body.admin-route .admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.25rem 0.6rem 1.4rem;
+  margin-bottom: 0.6rem;
+  border-bottom: 1px solid var(--zane-border);
+}
+
+body.admin-route .admin-brand img {
+  border-radius: 10px;
+  background: #fff;
+}
+
+body.admin-route .admin-brand span {
+  font-family: var(--zane-display);
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #fff;
+}
+
+body.admin-route .admin-brand b {
+  color: var(--zane-gold);
+  font-weight: 700;
+}
+
+body.admin-route .admin-brand small {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--zane-font);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--zane-text-muted);
+}
+
+body.admin-route .admin-tab {
+  border: 0;
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.95rem;
+  color: var(--zane-text-secondary);
+}
+
+body.admin-route .admin-tab i {
+  width: 1.4em;
+  text-align: center;
+  margin-right: 0.55rem !important;
+  opacity: 0.85;
+}
+
+body.admin-route .admin-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+body.admin-route .admin-tab.is-active {
+  background: var(--zane-gold);
+  color: #0F1115;
+}
+
+body.admin-route .admin-tab.is-active .tab-count {
+  background: rgba(15, 17, 21, 0.14);
+  color: #0F1115;
+}
+
+body.admin-route .admin-tab.is-active .tab-count.has-urgent {
+  background: var(--accent-urgent);
+  color: #fff;
+}
+
+body.admin-route .admin-site-link {
+  margin-top: auto;
+  padding: 0.8rem 0.9rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--zane-text-muted);
+  text-decoration: none;
+}
+
+body.admin-route .admin-site-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ---- Cabecera y resumen ---- */
+body.admin-route .admin-heading {
+  margin: 0;
+  padding-top: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 0;
+  gap: 1rem;
+}
+
+body.admin-route .admin-heading .section-title {
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  margin: 0.25rem 0 0;
+  text-align: left;
+}
+
+body.admin-route .admin-heading .eyebrow {
+  font-size: 0.72rem;
+}
+
+body.admin-route #adminLogout {
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+body.admin-route .admin-toolbar {
+  margin: 0 0 1.5rem;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+body.admin-route .admin-dash-stats {
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+body.admin-route .dash-stat {
+  min-width: 140px;
+  padding: 0.9rem 1.1rem;
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  border-radius: 16px;
+}
+
+body.admin-route .dash-stat strong {
+  font-size: 1.75rem;
+  color: #fff;
+}
+
+body.admin-route .dash-stat span {
+  font-size: 0.72rem;
+}
+
+body.admin-route #sendAllReminders {
+  align-self: center;
+  border-radius: 14px;
+  padding: 0.8rem 1.2rem;
+}
+
+body.admin-route [data-panel-view] {
+  padding-bottom: 3rem;
+}
+
+/* ---- Tarjetas, formularios y listas ---- */
+body.admin-route .client-form,
+body.admin-route .message-template,
+body.admin-route .device-panel {
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  border-radius: 20px;
+  padding: clamp(1.1rem, 2.4vw, 1.75rem);
+  margin-bottom: 1.25rem;
+}
+
+body.admin-route .client-form h3,
+body.admin-route .admin-list-head h3 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+body.admin-route .message-template label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+}
+
+body.admin-route .client-fields input,
+body.admin-route .client-fields select,
+body.admin-route .client-tools input,
+body.admin-route .client-tools select,
+body.admin-route .message-template textarea {
+  min-height: 48px;
+  border-radius: 12px;
+  background: var(--zane-bg-surface);
+  font-size: 0.95rem;
+}
+
+body.admin-route .admin-section .text-muted {
+  color: var(--zane-text-muted) !important;
+}
+
+body.admin-route .client-form-actions .btn,
+body.admin-route .client-tools .btn {
+  border-radius: 12px;
+  min-height: 46px;
+}
+
+body.admin-route .admin-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+body.admin-route .client-item {
+  background: var(--zane-bg-card);
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+body.admin-route .client-item:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+body.admin-route .client-actions button,
+body.admin-route .client-actions > a {
+  width: 40px;
+  height: 40px;
+  background: var(--zane-bg-main);
+}
+
+body.admin-route .admin-empty {
+  border-radius: 16px;
+  padding: 2.5rem 1rem;
+}
+
+/* ---- Turnos (sobrescribe el CSS que inyecta board.js) ---- */
+body.admin-route .board-bar {
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: var(--zane-bg-card);
+  border: 1px solid var(--zane-border);
+  border-radius: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+body.admin-route .board-bar .btn {
+  border-radius: 10px;
+  border-color: transparent;
+  font-size: 0.85rem;
+  padding: 0.55rem 0.9rem;
+}
+
+body.admin-route .board-bar .btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.admin-route .board-status {
+  font: 700 0.72rem/1 var(--zane-font);
+  letter-spacing: 0.08em;
+  margin-right: auto;
+  padding: 0.5rem 0.75rem;
+}
+
+body.admin-route .board-kpis {
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin: 1.25rem 0 0.5rem;
+}
+
+body.admin-route .kpi {
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+}
+
+body.admin-route .kpi strong {
+  font-family: var(--zane-font);
+  font-weight: 800;
+  font-size: 1.6rem;
+  font-variant-numeric: tabular-nums;
+}
+
+body.admin-route .kpi span,
+body.admin-route .device-row span,
+body.admin-route .board-days th {
+  font-family: var(--zane-font);
+  font-size: 0.72rem;
+}
+
+body.admin-route .device-row {
+  padding: 0.85rem 0;
+}
+
+body.admin-route .device-row strong,
+body.admin-route .device-row b {
+  font-size: 0.95rem;
+}
+
+body.admin-route .device-row .btn-no,
+body.admin-route .device-enroll-actions button {
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.82rem;
+}
+
+body.admin-route .device-enroll {
+  border-radius: 16px;
+  border-color: var(--zane-border-gold);
+}
+
+body.admin-route .turno-actions button,
+body.admin-route .turno-proof {
+  border-radius: 10px;
+}
+
+body.admin-route .board-history summary {
+  font-family: var(--zane-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  padding: 0.75rem 0;
+}
+
+/* ---- Teléfono y tablet: barra inferior tipo app ---- */
+@media (max-width: 900px) {
+  body.admin-route .admin-dashboard {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "heading"
+      "toolbar"
+      "content";
+    grid-template-rows: auto auto 1fr;
+  }
+
+  body.admin-route .admin-dashboard > :not(.admin-tabs) {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  body.admin-route [data-panel-view] {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  body.admin-route .admin-tabs {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1030;
+    height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+    margin: 0;
+    padding: 0.4rem 0.35rem calc(0.4rem + env(safe-area-inset-bottom));
+    background: rgba(15, 17, 21, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right: 0;
+    border-top: 1px solid var(--zane-border);
+    border-bottom: 0;
+    overflow: visible;
+  }
+
+  body.admin-route .admin-brand,
+  body.admin-route .admin-site-link {
+    display: none;
+  }
+
+  body.admin-route .admin-tab {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    padding: 0.45rem 0.1rem;
+    border-radius: 12px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    background: transparent;
+  }
+
+  body.admin-route .admin-tab > span:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+  }
+
+  body.admin-route .admin-tab i {
+    font-size: 1.15rem;
+    margin: 0 !important;
+    width: auto;
+  }
+
+  body.admin-route .admin-tab.is-active {
+    background: transparent;
+    color: var(--zane-gold-light);
+  }
+
+  body.admin-route .admin-tab.is-active i {
+    opacity: 1;
+  }
+
+  body.admin-route .admin-tab.is-active > span:first-child::before {
+    content: '';
+    position: absolute;
+    top: 0.2rem;
+    left: 50%;
+    width: 44px;
+    height: 30px;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: rgba(var(--zane-gold-rgb), 0.16);
+    z-index: -1;
+  }
+
+  body.admin-route .admin-tab .tab-count {
+    position: absolute;
+    top: 0.1rem;
+    left: calc(50% + 6px);
+    min-width: 18px;
+    padding: 0.05rem 0.3rem;
+    font-size: 0.62rem;
+    line-height: 1.4;
+  }
+
+  body.admin-route .admin-tab .tab-count:not(.has-urgent) {
+    display: none;
+  }
+
+  body.admin-route .admin-heading {
+    padding-top: 1.1rem;
+    padding-bottom: 0.9rem;
+  }
+
+  body.admin-route .admin-heading .section-title {
+    font-size: 1.45rem;
+    line-height: 1.1;
+  }
+
+  body.admin-route #adminLogout {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body.admin-route #adminLogout i {
+    font-size: 1rem;
+    margin: 0 !important;
+  }
+
+  body.admin-route .admin-toolbar {
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  body.admin-route .admin-dash-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.admin-route .dash-stat {
+    min-width: 0;
+  }
+
+  body.admin-route #sendAllReminders {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  body.admin-route .client-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.admin-route .client-reminder {
+    text-align: left;
+  }
+
+  body.admin-route .client-tools > * {
+    flex: 1 1 140px;
+  }
+
+  body.admin-route .client-tools #clientSearch {
+    flex-basis: 100%;
+  }
+
+  body.admin-route .board-bar .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  body.admin-route .board-status {
+    flex-basis: 100%;
+    text-align: center;
+    margin: 0;
+  }
+}
+
+body:not(.admin-route) .admin-brand,
+body:not(.admin-route) .admin-site-link {
+  display: none;
+}

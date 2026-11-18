@@ -134,7 +134,34 @@
   }
 
   // ---- render principal ---------------------------------------
+  function updateSteps() {
+    var steps = document.getElementById('steps');
+    if (!steps) return;
+    var current = STEP_ORDER.indexOf(state.step);
+    steps.hidden = current < 0;
+    steps.querySelectorAll('li').forEach(function (li, index) {
+      li.classList.toggle('is-done', index < current);
+      li.classList.toggle('is-current', index === current);
+    });
+  }
+
+  function tickClock() {
+    var clock = document.getElementById('clock');
+    if (clock) clock.textContent = new Date().toLocaleTimeString('es-VE', { hour: 'numeric', minute: '2-digit' });
+  }
+  tickClock();
+  setInterval(tickClock, 15000);
+
+  function serviceIcon(s) {
+    var name = String(s.name || '').toLowerCase();
+    if (name.indexOf('color') > -1) return 'fa-palette';
+    if (name.indexOf('vip') > -1) return 'fa-crown';
+    if (name.indexOf('barba') > -1) return 'fa-user-tie';
+    return 'fa-scissors';
+  }
+
   function render() {
+    updateSteps();
     if (state.step === 'menu') return renderMenu();
     if (state.step === 'datos') return renderDatos();
     if (state.step === 'pago') return renderPago();
@@ -165,14 +192,20 @@
   // ---- paso 1 · menú ------------------------------------------
   function renderMenu() {
     app.innerHTML =
+      '<header class="k-head"><span class="k-eyebrow">Bienvenido a Zane Barber Studio</span>' +
       '<h1 class="k-title">Elige tu servicio</h1>' +
+      '<p class="k-sub">Toca una opción para empezar. Pagas por Pago Móvil y te llamamos por tu nombre.</p></header>' +
       '<div class="k-grid">' +
       state.menu.map(function (s) {
         return '<button class="k-card" data-id="' + s.id + '">' +
+          '<span class="k-card-icon"><i class="fas ' + serviceIcon(s) + '" aria-hidden="true"></i></span>' +
           '<span class="k-card-name">' + esc(s.name) + '</span>' +
           '<span class="k-card-desc">' + esc(s.description || '') + '</span>' +
-          '<span class="k-card-price">' + money(s.amount_bs) +
-          '<small>$' + (s.amount_usd_cents / 100).toFixed(0) + ' · ' + s.duration_min + ' min</small></span>' +
+          '<span class="k-card-foot">' +
+            '<span class="k-card-price">' + money(s.amount_bs) + '</span>' +
+            '<span class="k-chip"><i class="far fa-clock" aria-hidden="true"></i> ' + s.duration_min + ' min</span>' +
+            '<span class="k-card-go" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>' +
+          '</span>' +
           '</button>';
       }).join('') +
       '</div>';
@@ -187,16 +220,25 @@
   // ---- paso 2 · datos ----------------------------------------
   function renderDatos() {
     app.innerHTML =
+      '<header class="k-head"><span class="k-eyebrow">Paso 2 de 4</span>' +
       '<h1 class="k-title">Tus datos</h1>' +
+      '<p class="k-sub">Los usamos para llamarte cuando sea tu turno.</p></header>' +
+      '<div class="k-split">' +
+      '<aside class="k-pick">' +
+        '<span class="k-card-icon"><i class="fas ' + serviceIcon(state.pick) + '" aria-hidden="true"></i></span>' +
+        '<span class="k-pick-label">Tu servicio</span>' +
+        '<strong class="k-pick-name">' + esc(state.pick.name) + '</strong>' +
+        '<span class="k-pick-price">' + money(state.pick.amount_bs) + '</span>' +
+        '<span class="k-chip"><i class="far fa-clock" aria-hidden="true"></i> ' + state.pick.duration_min + ' min</span>' +
+      '</aside>' +
       '<form id="f" class="k-form">' +
-      '<label>Nombre y apellido<input name="name" type="text" autocomplete="off" maxlength="80" required></label>' +
+      '<label>Nombre y apellido<input name="name" type="text" autocomplete="off" maxlength="80" placeholder="Ej. Carlos Pérez" required></label>' +
       '<label>Teléfono (WhatsApp)<input name="phone" type="tel" inputmode="numeric" maxlength="20" ' +
       'placeholder="0412 000 0000" required></label>' +
-      '<div class="k-summary">' + esc(state.pick.name) + ' · ' + money(state.pick.amount_bs) + '</div>' +
       '<div class="k-actions">' +
-      '<button type="button" id="back">Atrás</button>' +
-      '<button type="submit" class="k-primary">Continuar al pago</button>' +
-      '</div></form>';
+      '<button type="button" id="back"><i class="fas fa-arrow-left" aria-hidden="true"></i> Atrás</button>' +
+      '<button type="submit" class="k-primary">Continuar al pago <i class="fas fa-arrow-right" aria-hidden="true"></i></button>' +
+      '</div></form></div>';
     document.getElementById('back').onclick = function () { state.pick = null; go('menu'); };
     document.getElementById('f').onsubmit = function (e) {
       e.preventDefault();
@@ -236,13 +278,14 @@
         '</div></div>';
     }).join('');
     app.innerHTML =
-      '<h1 class="k-title">Pago Móvil</h1>' +
-      '<p class="k-sub">Paga a cualquiera de estos por el <strong>monto exacto</strong> desde tu banca.</p>' +
-      '<div class="k-amount-box"><span>Monto exacto</span><b>' + money(o.amount_bs) + '</b></div>' +
+      '<header class="k-head"><span class="k-eyebrow">Paso 3 de 4 · Orden ' + esc(o.code || '') + '</span>' +
+      '<h1 class="k-title">Paga con Pago Móvil</h1>' +
+      '<p class="k-sub">Escanea el QR o usa los datos de cualquiera de estas cuentas, por el <strong>monto exacto</strong>.</p></header>' +
+      '<div class="k-amount-box"><span>Monto exacto a pagar</span><b>' + money(o.amount_bs) + '</b></div>' +
       '<div class="k-methods">' + blocks + '</div>' +
-      '<form id="pf" class="k-form" style="margin-top:24px">' +
-      '<p class="k-note">Cuando termines el pago pulsa el botón y espera a ser llamado.</p>' +
-      '<div class="k-actions"><button type="submit" class="k-primary">Ya pagué</button></div>' +
+      '<form id="pf" class="k-paybar">' +
+      '<p class="k-note"><i class="fas fa-circle-info" aria-hidden="true"></i> Cuando termines el pago, pulsa el botón y espera a ser llamado.</p>' +
+      '<button type="submit" class="k-primary"><i class="fas fa-check" aria-hidden="true"></i> Ya pagué</button>' +
       '</form>';
 
     app.querySelectorAll('.k-qr img').forEach(function (im) {
@@ -259,7 +302,7 @@
       api('/orders/' + o.code + '/payment', { method: 'POST', body: JSON.stringify({}) }).then(function () {
         go('waiting'); watchStatus();
       }).catch(function (x) {
-        btn.disabled = false; btn.textContent = 'Ya pagué';
+        btn.disabled = false; btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Ya pagué';
         toast((x && x.error) || 'No se pudo registrar. Intenta de nuevo.');
       });
     };
@@ -291,13 +334,16 @@
     var cls = extra && extra.cls ? ' ' + extra.cls : '';
     app.innerHTML =
       '<div class="k-wait' + cls + '">' +
+      '<div class="k-ticket">' +
       '<div class="k-check"><i class="fas ' + (extra && extra.icon || 'fa-check') + '"></i></div>' +
-      '<div class="k-code">' + esc(state.order.code) + '</div>' +
       '<h1>' + esc(extra && extra.title || 'Pago recibido') + '</h1>' +
+      '<span class="k-ticket-label">Tu orden</span>' +
+      '<div class="k-code">' + esc(state.order.code) + '</div>' +
       '<p id="wmsg">' + esc(extra && extra.msg || 'Espera a ser llamado. Te avisamos por tu nombre.') + '</p>' +
+      '</div>' +
       (extra && extra.retry
-        ? '<button id="retry">Reintentar pago</button>'
-        : '<button id="new">Nueva orden</button>') +
+        ? '<button id="retry"><i class="fas fa-rotate-right" aria-hidden="true"></i> Reintentar pago</button>'
+        : '<button id="new"><i class="fas fa-plus" aria-hidden="true"></i> Nueva orden</button>') +
       '</div>';
     var nb = document.getElementById('new');
     if (nb) nb.onclick = function () {
